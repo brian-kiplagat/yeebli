@@ -7,14 +7,14 @@
   "keywords": [],
   "author": {
     "name": "Brian Kiplagat",
-    "url": "https://github.com/briankiplagat"
+    "url": "https://github.com/bitcoindevke"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/briankiplagat/rendify.git"
+    "url": "git+https://github.com/bitcoindevke/rendify.git"
   },
   "bugs": {
-    "url": "https://github.com/briankiplagat/rendify/issues"
+    "url": "https://github.com/bitcoindevke/rendify/issues"
   },
   "type": "module",
   "main": "src/index.ts",

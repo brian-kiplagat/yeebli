@@ -1,5 +1,15 @@
 # @finsweet/developer-starter
 
+## 1.0.2
+
+### Patch Changes
+
+- b2f2609: fix: patch
+- ca35ce4: fix: patvh
+- e123dd4: fix: patch
+- 07a9805: fix: patch
+- 24dc155: fix
+
 ## 1.0.1
 
 ### Patch Changes

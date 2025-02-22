@@ -42,10 +42,10 @@ jobs:
       - name: Create .npmrc
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-     - name: Create Release PR and Publish
-  uses: changesets/action@v1
-  with:
-    publish: pnpm release
-  env:
-    GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create Release PR and Publish
+        uses: changesets/action@v1
+        with:
+          publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

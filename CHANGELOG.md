@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.0.1
+
+### Patch Changes
+
+- df06cd8: FIX: CHANGESET
+
 ## 1.0.0
 
 ### Major Changes

@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
     - name: Checkout Repo
@@ -31,7 +32,6 @@ jobs:
       with:
         node-version: 22
         cache: pnpm
-        registry-url: 'https://registry.npmjs.org/'
 
     - name: Install Dependencies
       run: pnpm install --frozen-lockfile
@@ -42,28 +42,10 @@ jobs:
     - name: Create .npmrc
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-    - name: Check for Changesets
-      id: check_changesets
-      run: |
-        if [ -z "$(ls -A .changeset 2>/dev/null)" ]; then
-          echo "No changesets found. Skipping release."
-          exit 0
-        fi
-
-    - name: Auto Version & Publish
-      if: success()
-      run: |
-        pnpm version patch --no-git-tag-version
-        pnpm publish --access public
+    - name: Create Release PR and Publish
+      uses: changesets/action@v1
+      with:
+        publish: pnpm release
       env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-    - name: Clean Up Changesets
-      if: success()
-      run: |
-        rm -rf .changeset
-        git add .
-        git commit -m "chore: remove processed changesets" || echo "No changesets to clean"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

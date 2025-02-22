@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- 8e36199: fix: patch
+
+## 1.0.1
+
+### Patch Changes
+
 - df06cd8: FIX: CHANGESET
 
 ## 1.0.0

@@ -29,9 +29,12 @@ jobs:
       - name: Build Project
         run: pnpm build
 
+      # Create .npmrc for authentication
       - name: Create .npmrc
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        if: ${{ secrets.NPM_TOKEN }}
 
+      # Create Release Pull Request and Publish
       - name: Create Release PR and Publish
         uses: changesets/action@v1
         with:

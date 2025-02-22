@@ -1,14 +1,10 @@
 name: Release
 
 on:
-  workflow_call:
-    inputs:
-      staging-branch:
-        required: false
-        type: string
-    secrets:
-      NPM_TOKEN:
-        required: false
+  push:
+    branches:
+      - main
+      - master
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -40,32 +36,20 @@ jobs:
       - name: Build Project
         run: pnpm build
 
-      # 1️⃣ If no NPM_TOKEN, just create a PR for versioning
+      # No NPM_TOKEN: Just create a versioning PR
       - name: (No NPM) Create Release Pull Request
         uses: changesets/action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: ${{ !secrets.NPM_TOKEN && inputs.staging-branch != github.ref_name }}
+        if: ${{ !secrets.NPM_TOKEN }}
 
-      # 2️⃣ If NPM_TOKEN exists, create .npmrc for authentication
+      # Create .npmrc if NPM_TOKEN exists
       - name: Create .npmrc
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
         if: ${{ secrets.NPM_TOKEN }}
 
-      # 3️⃣ Handle Staging Release
-      - name: (Staging) Release Pull Request and Publish
-        id: changesets-staging
-        uses: changesets/action@v1
-        with:
-          version: pnpm version:staging
-          publish: pnpm release:staging
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        if: ${{ secrets.NPM_TOKEN && inputs.staging-branch == github.ref_name }}
-
-      # 4️⃣ Handle Production Release
-      - name: (Production) Release Pull Request and Publish
+      # Production Release
+      - name: (Production) Release and Publish
         id: changesets-production
         uses: changesets/action@v1
         with:
@@ -73,4 +57,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        if: ${{ secrets.NPM_TOKEN && inputs.staging-branch != github.ref_name }}

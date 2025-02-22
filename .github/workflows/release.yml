@@ -38,21 +38,12 @@ jobs:
       - name: Build Project
         run: pnpm build
 
-      # No NPM_TOKEN: Just create a versioning PR
-      - name: (No NPM) Create Release Pull Request
-        uses: changesets/action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: ${{ !secrets.NPM_TOKEN }}
-
-      # Create .npmrc if NPM_TOKEN exists
+      # Create .npmrc for authentication
       - name: Create .npmrc
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        if: ${{ secrets.NPM_TOKEN }}
 
-      # Production Release
-      - name: (Production) Release and Publish
-        id: changesets-production
+      # Create Release Pull Request and Publish
+      - name: Create Release PR and Publish
         uses: changesets/action@v1
         with:
           publish: pnpm release

@@ -2,7 +2,7 @@
   "name": "@bitcoindevke/yeebli",
   "version": "1.0.2",
   "description": "Developer template for Quick Wized TS projects.",
-  "homepage": "https://github.com/briankiplagat/rendify#readme",
+  "homepage": "https://github.com/briankiplagat/yeebli#readme",
   "license": "ISC",
   "keywords": [],
   "author": {
@@ -11,10 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitcoindevke/rendify.git"
+    "url": "git+https://github.com/bitcoindevke/yeebli.git"
   },
   "bugs": {
-    "url": "https://github.com/bitcoindevke/rendify/issues"
+    "url": "https://github.com/bitcoindevke/yeebli/issues"
   },
   "type": "module",
   "main": "src/index.ts",

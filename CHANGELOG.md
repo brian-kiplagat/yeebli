@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.0.1
+
+### Patch Changes
+
+- 1ce239a: fix: latest
+
 ## 1.0.2
 
 ### Patch Changes

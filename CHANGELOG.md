@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.0.2
+
+### Patch Changes
+
+- 283b9d1: fix: auth
+
 ## 1.0.1
 
 ### Patch Changes

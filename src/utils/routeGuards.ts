@@ -50,7 +50,7 @@ export class RouteGuard {
     }
 
     const {
-      redirectPath = options.redirectPath || '/login',
+      redirectPath = options.redirectPath || '/onboarding/login',
       requireAuth = options.requireAuth ?? true,
     } = matchedRoute;
 

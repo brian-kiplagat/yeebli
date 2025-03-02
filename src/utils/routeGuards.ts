@@ -11,7 +11,11 @@ interface ProtectedRoute {
 
 export class RouteGuard {
   private static protectedPaths: ProtectedRoute[] = [
-    { path: '/dashboard', requireAuth: true },
+    { path: '/host/dashboard-host-view-leads', requireAuth: true },
+    { path: '/host/dashboard-host-add-leads', requireAuth: true },
+    { path: '/host/dashboard-host-add-event', requireAuth: true },
+    { path: '/host/dashboard-host-view-events', requireAuth: true },
+    { path: '/host/dashboard-host-view-assets', requireAuth: true },
     { path: '/profile', requireAuth: true },
     { path: '/settings', requireAuth: true, redirectPath: '/custom-login' },
     // Add more protected paths as needed

@@ -10,7 +10,7 @@ const PRODUCTION = process.env.NODE_ENV === 'production';
 const ENTRY_POINTS = ['src/index.ts'];
 
 // Config dev serving
-const LIVE_RELOAD = !PRODUCTION;
+const LIVE_RELOAD = true;
 const SERVE_PORT = 6800;
 const SERVE_ORIGIN = `http://localhost:${SERVE_PORT}`;
 

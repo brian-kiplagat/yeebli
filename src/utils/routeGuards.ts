@@ -18,8 +18,12 @@ export class RouteGuard {
   ];
 
   private static isAuthenticated(): boolean {
-    // Replace this with your actual authentication check
-    return !!localStorage.getItem('authToken');
+    // Get authToken from cookies
+    const cookies = document.cookie.split('; ');
+    const authToken = cookies.find((cookie) => cookie.startsWith('authToken='))?.split('=')[1];
+    const user = cookies.find((cookie) => cookie.startsWith('user='))?.split('=')[1];
+    console.log(authToken, user);
+    return !!authToken && !!user;
   }
 
   private static getCurrentPath(): string {

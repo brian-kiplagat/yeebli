@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.0.3
+
+### Patch Changes
+
+- d9539c4: fix: paths
+
 ## 1.0.2
 
 ### Patch Changes

@@ -28,7 +28,7 @@ export class RouteGuard {
     const authToken = cookies.find((cookie) => cookie.startsWith('token='))?.split('=')[1];
     const user = cookies.find((cookie) => cookie.startsWith('user='))?.split('=')[1];
     if (!authToken || !user) {
-      console.log('no authToken or user');
+      console.error('no authToken or user');
       return false;
     }
     //confirm authToken is actualy valid by posting to server with bearer token
@@ -75,6 +75,7 @@ export class RouteGuard {
     if (requireAuth) {
       const authenticated = await this.isAuthenticated();
       if (!authenticated) {
+        console.error('not authenticated, kicking out');
         window.location.href = redirectPath;
         return false;
       }

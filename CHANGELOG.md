@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.0
+
+### Minor Changes
+
+- 0402ad1: fix:minor
+
 ## 1.0.3
 
 ### Patch Changes

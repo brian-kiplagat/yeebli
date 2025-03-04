@@ -24,25 +24,33 @@ export class RouteGuard {
     // Add more protected paths as needed
   ];
 
+  private static authToken: string;
+
+  /**
+   * Sets the authentication token for route guards
+   * @param token - The authentication token
+   */
+  static setAuthToken(token: string) {
+    this.authToken = token;
+  }
+
   private static async isAuthenticated(): Promise<boolean> {
-    // Get authToken from cookies
-    const cookies = document.cookie.split('; ');
-    const authToken = cookies.find((cookie) => cookie.startsWith('token='))?.split('=')[1];
-    const user = cookies.find((cookie) => cookie.startsWith('user='))?.split('=')[1];
-    if (!authToken || !user) {
-      console.error('no authToken or user');
+    if (!this.authToken) {
       return false;
     }
-    //confirm authToken is actualy valid by posting to server with bearer token
+
+    // Confirm authToken is actually valid by posting to server with bearer token
     const response = await fetch('https://api.3themind.com/v1/user/me', {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${authToken}`,
+        Authorization: `Bearer ${this.authToken}`,
       },
     });
+
     if (!response.ok) {
       return false;
     }
+
     const data = await response.json();
     const userObject = data.data.user;
     console.log(userObject);

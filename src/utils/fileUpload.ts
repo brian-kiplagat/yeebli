@@ -7,10 +7,12 @@ interface UploadResult {
   success: boolean;
   url?: string;
   error?: string;
+  progress?: number;
 }
 
 export class FileUploader {
-  private static readonly API_ENDPOINT = 'http://localhost:3500/v1/s3/presigned-url';
+  private static readonly rootUrl = 'http://localhost:3500';
+  private static readonly API_ENDPOINT = `${this.rootUrl}/v1/s3/presigned-url`;
   private static authToken: string;
 
   /**
@@ -22,7 +24,7 @@ export class FileUploader {
   }
 
   /**
-   * Handles file upload to S3 using presigned URL
+   * Handles file upload to S3 using presigned URL with progress tracking
    * @param fileInput - The file input element with wized="file_uploader"
    * @returns Promise<UploadResult>
    */
@@ -37,23 +39,47 @@ export class FileUploader {
       // Get presigned URL
       const presignedUrlResponse = await this.getPresignedUrl(file.name, file.type);
 
-      // Upload file to S3 using the presigned URL
-      const uploadResponse = await fetch(presignedUrlResponse.presignedUrl, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
+      // Upload file using XMLHttpRequest for progress tracking
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            localStorage.setItem('progress', progress.toString());
+            // Dispatch progress event
+            const progressEvent = new CustomEvent('fileUploadProgress', {
+              detail: { progress },
+            });
+            document.dispatchEvent(progressEvent);
+          }
+        });
+
+        // Handle upload completion
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            console.log('File uploaded successfully');
+            resolve({
+              success: true,
+              url: presignedUrlResponse.url,
+              progress: 100,
+            });
+          } else {
+            reject(new Error('Failed to upload file to S3'));
+          }
+        });
+
+        // Handle upload errors
+        xhr.addEventListener('error', () => {
+          reject(new Error('Network error occurred during upload'));
+        });
+
+        // Open and send the request
+        xhr.open('PUT', presignedUrlResponse.presignedUrl);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.send(file);
       });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file to S3');
-      }
-
-      return {
-        success: true,
-        url: presignedUrlResponse.url,
-      };
     } catch (error) {
       console.error('File upload error:', error);
       return {

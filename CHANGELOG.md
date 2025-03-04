@@ -1,5 +1,13 @@
 # @finsweet/developer-starter
 
+## 1.1.2
+
+### Patch Changes
+
+- a0cfd57: fix: service
+- 4febfdf: fix: s3
+- 43a1d86: fix: urls
+
 ## 1.1.1
 
 ### Patch Changes

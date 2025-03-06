@@ -11,7 +11,7 @@ interface UploadResult {
 }
 
 export class FileUploader {
-  private static readonly rootUrl = 'http://localhost:3500';
+  private static readonly rootUrl = 'https://api.3themind.com';
   private static readonly API_ENDPOINT = `${this.rootUrl}/v1/asset`;
   private static authToken: string;
 

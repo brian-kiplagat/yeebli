@@ -35,9 +35,17 @@ export class FileUploader {
       }
 
       const file = fileInput.files[0];
+      //aset tyope can be only "image" | "video" | "audio" | "document"
+      const assetType = file.type.startsWith('image/')
+        ? 'image'
+        : file.type.startsWith('video/')
+          ? 'video'
+          : file.type.startsWith('audio/')
+            ? 'audio'
+            : 'document';
 
       // Get presigned URL
-      const presignedUrlResponse = await this.getPresignedUrl(file.name, file.type);
+      const presignedUrlResponse = await this.getPresignedUrl(file.name, file.type, assetType);
 
       // Upload file using XMLHttpRequest for progress tracking
       return new Promise((resolve, reject) => {
@@ -97,7 +105,8 @@ export class FileUploader {
    */
   private static async getPresignedUrl(
     fileName: string,
-    contentType: string
+    contentType: string,
+    assetType: string
   ): Promise<PresignedUrlResponse> {
     if (!this.authToken) {
       throw new Error('Authentication token not set');
@@ -112,6 +121,7 @@ export class FileUploader {
       body: JSON.stringify({
         fileName,
         contentType,
+        assetType,
       }),
     });
 

@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.3
+
+### Patch Changes
+
+- 52775d9: fix: new
+
 ## 1.1.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @finsweet/developer-starter
 
+## 1.1.4
+
+### Patch Changes
+
+- ba0c272: fix: url
+- fed0764: fix: css
+- d2dfea6: url
+
 ## 1.1.3
 
 ### Patch Changes

@@ -12,7 +12,7 @@ interface UploadResult {
 
 export class FileUploader {
   private static readonly rootUrl = 'http://localhost:3500';
-  private static readonly API_ENDPOINT = `${this.rootUrl}/v1/s3/presigned-url`;
+  private static readonly API_ENDPOINT = `${this.rootUrl}/v1/asset`;
   private static authToken: string;
 
   /**

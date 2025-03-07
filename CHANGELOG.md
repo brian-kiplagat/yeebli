@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.5
+
+### Patch Changes
+
+- 76d434b: fix: metadata
+
 ## 1.1.4
 
 ### Patch Changes

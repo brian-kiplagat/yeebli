@@ -107,12 +107,22 @@ const addToHead = () => {
 const setupMetadata = (eventData: EventData) => {
   const event_page_name = document.querySelector('[wized="event_page_name"]');
   const event_page_date = document.querySelector('[wized="event_page_date"]');
-  const event_page_start_time = document.querySelector('[wized="event_page_start_time"]');
+  const event_page_start_time = document.querySelector('[wized="event_page_start"]');
 
-  if (event_page_name && event_page_date && event_page_start_time) {
+  if (event_page_name) {
     event_page_name.textContent = eventData.event_name;
+  } else {
+    console.warn('No event_page_name found');
+  }
+  if (event_page_date) {
     event_page_date.textContent = eventData.event_date;
+  } else {
+    console.warn('No event_page_date found');
+  }
+  if (event_page_start_time) {
     event_page_start_time.textContent = eventData.start_time;
+  } else {
+    console.warn('No event_page_start_time found');
   }
 };
 

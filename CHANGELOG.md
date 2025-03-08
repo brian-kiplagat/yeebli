@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.7
+
+### Patch Changes
+
+- 334b2dc: fix: widget
+
 ## 1.1.6
 
 ### Patch Changes

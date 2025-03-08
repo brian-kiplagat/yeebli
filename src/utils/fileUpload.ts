@@ -14,8 +14,9 @@ export class FileUploader {
   private static readonly rootUrl = 'https://api.3themind.com';
   private static readonly API_ENDPOINT = `${this.rootUrl}/v1/asset`;
   private static authToken: string;
-  private static uploading_progress_wrapper: HTMLElement;
-  private static uploading_progress_bar: HTMLElement;
+  private static upload_progress_wrapper: HTMLElement;
+  private static upload_progress_bar: HTMLElement;
+  private static upload_progress_counter: HTMLElement;
 
   /**
    * Sets the authentication token for file uploads
@@ -29,15 +30,24 @@ export class FileUploader {
    * Initializes the progress bar elements
    */
   public static initializeProgressBar() {
-    this.uploading_progress_wrapper = document.querySelector(
+    this.upload_progress_wrapper = document.querySelector(
       '[wized="upload_progress_wrapper"]'
     ) as HTMLElement;
-    this.uploading_progress_bar = document.querySelector(
+    this.upload_progress_bar = document.querySelector(
       '[wized="upload_progress_bar"]'
     ) as HTMLElement;
+    this.upload_progress_counter = document.querySelector(
+      '[wized="upload_progress_counter"]'
+    ) as HTMLElement;
 
-    if (!this.uploading_progress_wrapper || !this.uploading_progress_bar) {
-      console.warn('Progress bar elements not found');
+    if (!this.upload_progress_wrapper) {
+      console.warn('Progress bar wrapper not found');
+    }
+    if (!this.upload_progress_bar) {
+      console.warn('Progress bar not found');
+    }
+    if (!this.upload_progress_counter) {
+      console.warn('Progress counter not found');
     }
   }
 
@@ -46,9 +56,40 @@ export class FileUploader {
    * @param progress - Upload progress percentage (0-100)
    */
   private static updateProgressBar(progress: number) {
-    if (this.uploading_progress_bar) {
-      this.uploading_progress_bar.style.width = `${progress}%`;
+    if (this.upload_progress_bar) {
+      this.upload_progress_bar.style.width = `${progress}%`;
+      if (progress === 100) {
+        this.upload_progress_bar.style.backgroundColor = 'green';
+        //wait 1 second and hide the wrapper
+        setTimeout(() => {
+          this.hideProgressBar();
+        }, 1000);
+        //reset the progress counter
+        this.upload_progress_counter.textContent = '0%';
+        //reset the progress bar
+        this.upload_progress_bar.style.width = '0%';
+        //reset the progress bar background color
+        this.upload_progress_bar.style.backgroundColor = '#fe5b25';
+      } else {
+        this.upload_progress_bar.style.backgroundColor = '#fe5b25';
+      }
     }
+    if (this.upload_progress_counter) {
+      this.upload_progress_counter.textContent = `${progress}%`;
+    }
+  }
+
+  /**
+   * Shows the progress bar
+   */
+  public static showProgressBar() {
+    this.upload_progress_wrapper.style.display = 'flex';
+  }
+  /**
+   * Hides the progress bar
+   */
+  public static hideProgressBar() {
+    this.upload_progress_wrapper.style.display = 'none';
   }
 
   /**
@@ -178,7 +219,8 @@ export function initializeFileUpload(authToken: string) {
   FileUploader.setAuthToken(authToken);
   // Initialize progress bar elements
   FileUploader.initializeProgressBar();
-
+  //hide the progreebar initially
+  FileUploader.hideProgressBar();
   const fileInput = document.querySelector('[wized="file_uploader"]') as HTMLInputElement;
 
   if (!fileInput) {
@@ -187,6 +229,8 @@ export function initializeFileUpload(authToken: string) {
   }
 
   fileInput.addEventListener('change', async () => {
+    //show the progress bar
+    FileUploader.showProgressBar();
     const result = await FileUploader.handleFileUpload(fileInput);
 
     if (result.success) {

@@ -68,6 +68,8 @@ export class FileUploader {
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             console.log('File uploaded successfully');
+            //@ts-expect-error - Wized is injected by Webflow at runtime
+            Wized.requests.execute('Get_Assets');
             resolve({
               success: true,
               url: presignedUrlResponse.url,

@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.1.6
+
+### Patch Changes
+
+- c1219db: fix: ts
+- 8eafe81: fix: size
+
 ## 1.1.5
 
 ### Patch Changes

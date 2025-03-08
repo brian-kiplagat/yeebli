@@ -14,6 +14,8 @@ export class FileUploader {
   private static readonly rootUrl = 'https://api.3themind.com';
   private static readonly API_ENDPOINT = `${this.rootUrl}/v1/asset`;
   private static authToken: string;
+  private static uploading_progress_wrapper: HTMLElement;
+  private static uploading_progress_bar: HTMLElement;
 
   /**
    * Sets the authentication token for file uploads
@@ -21,6 +23,32 @@ export class FileUploader {
    */
   static setAuthToken(token: string) {
     this.authToken = token;
+  }
+
+  /**
+   * Initializes the progress bar elements
+   */
+  public static initializeProgressBar() {
+    this.uploading_progress_wrapper = document.querySelector(
+      '[wized="upload_progress_wrapper"]'
+    ) as HTMLElement;
+    this.uploading_progress_bar = document.querySelector(
+      '[wized="upload_progress_bar"]'
+    ) as HTMLElement;
+
+    if (!this.uploading_progress_wrapper || !this.uploading_progress_bar) {
+      console.warn('Progress bar elements not found');
+    }
+  }
+
+  /**
+   * Updates the progress bar width based on upload progress
+   * @param progress - Upload progress percentage (0-100)
+   */
+  private static updateProgressBar(progress: number) {
+    if (this.uploading_progress_bar) {
+      this.uploading_progress_bar.style.width = `${progress}%`;
+    }
   }
 
   /**
@@ -61,6 +89,8 @@ export class FileUploader {
           if (event.lengthComputable) {
             const progress = Math.round((event.loaded / event.total) * 100);
             localStorage.setItem('progress', progress.toString());
+            // Update progress bar
+            this.updateProgressBar(progress);
             // Dispatch progress event
             const progressEvent = new CustomEvent('fileUploadProgress', {
               detail: { progress },
@@ -146,6 +176,8 @@ export class FileUploader {
 export function initializeFileUpload(authToken: string) {
   // Set the auth token
   FileUploader.setAuthToken(authToken);
+  // Initialize progress bar elements
+  FileUploader.initializeProgressBar();
 
   const fileInput = document.querySelector('[wized="file_uploader"]') as HTMLInputElement;
 

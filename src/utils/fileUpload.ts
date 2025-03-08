@@ -45,7 +45,12 @@ export class FileUploader {
             : 'document';
 
       // Get presigned URL
-      const presignedUrlResponse = await this.getPresignedUrl(file.name, file.type, assetType);
+      const presignedUrlResponse = await this.getPresignedUrl(
+        file.name,
+        file.type,
+        assetType,
+        file.size
+      );
 
       // Upload file using XMLHttpRequest for progress tracking
       return new Promise((resolve, reject) => {
@@ -108,7 +113,8 @@ export class FileUploader {
   private static async getPresignedUrl(
     fileName: string,
     contentType: string,
-    assetType: string
+    assetType: string,
+    fileSize: number
   ): Promise<PresignedUrlResponse> {
     if (!this.authToken) {
       throw new Error('Authentication token not set');
@@ -124,6 +130,7 @@ export class FileUploader {
         fileName,
         contentType,
         assetType,
+        fileSize,
       }),
     });
 

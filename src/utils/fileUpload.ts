@@ -17,6 +17,7 @@ export class FileUploader {
   private static upload_progress_wrapper: HTMLElement;
   private static upload_progress_bar: HTMLElement;
   private static upload_progress_counter: HTMLElement;
+  //private static upload_prgress_bar_color: string = '#006cd9';
 
   /**
    * Sets the authentication token for file uploads
@@ -55,7 +56,7 @@ export class FileUploader {
    */
   public static resetProgressBar() {
     this.upload_progress_bar.style.width = '0%';
-    this.upload_progress_bar.style.backgroundColor = '#fe5b25';
+    //this.upload_progress_bar.style.backgroundColor = '#fe5b25';
     this.upload_progress_counter.textContent = '0%';
   }
 
@@ -75,7 +76,7 @@ export class FileUploader {
         }, 1000);
         //reset the progress counter
       } else {
-        this.upload_progress_bar.style.backgroundColor = '#fe5b25';
+        //this.upload_progress_bar.style.backgroundColor = this.upload_progress_bar_color;
       }
     }
     if (this.upload_progress_counter) {

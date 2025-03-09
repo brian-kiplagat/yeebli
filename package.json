@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@finsweet/ts-utils": "^0.40.0",
+    "hls.js": "^1.5.20",
     "plyr": "^3.7.8"
   },
   "engines": {

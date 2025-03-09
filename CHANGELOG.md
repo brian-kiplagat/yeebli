@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.9
+
+### Patch Changes
+
+- d000caa: fix: hls
+
 ## 1.1.8
 
 ### Patch Changes

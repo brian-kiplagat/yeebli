@@ -50,6 +50,14 @@ export class FileUploader {
       console.warn('Progress counter not found');
     }
   }
+  /**
+   * Resets the progress bar
+   */
+  public static resetProgressBar() {
+    this.upload_progress_bar.style.width = '0%';
+    this.upload_progress_bar.style.backgroundColor = '#fe5b25';
+    this.upload_progress_counter.textContent = '0%';
+  }
 
   /**
    * Updates the progress bar width based on upload progress
@@ -62,14 +70,10 @@ export class FileUploader {
         this.upload_progress_bar.style.backgroundColor = 'green';
         //wait 1 second and hide the wrapper
         setTimeout(() => {
+          this.resetProgressBar();
           this.hideProgressBar();
         }, 1000);
         //reset the progress counter
-        this.upload_progress_counter.textContent = '0%';
-        //reset the progress bar
-        this.upload_progress_bar.style.width = '0%';
-        //reset the progress bar background color
-        this.upload_progress_bar.style.backgroundColor = '#fe5b25';
       } else {
         this.upload_progress_bar.style.backgroundColor = '#fe5b25';
       }
@@ -231,6 +235,7 @@ export function initializeFileUpload(authToken: string) {
   fileInput.addEventListener('change', async () => {
     //show the progress bar
     FileUploader.showProgressBar();
+    FileUploader.resetProgressBar();
     const result = await FileUploader.handleFileUpload(fileInput);
 
     if (result.success) {

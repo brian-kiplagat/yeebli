@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.8
+
+### Patch Changes
+
+- 0b24b83: fix: progress bar
+
 ## 1.1.7
 
 ### Patch Changes

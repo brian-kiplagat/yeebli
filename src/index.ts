@@ -28,8 +28,8 @@ interface EventData {
   asset: Asset;
 }
 
-window.Webflow ||= [];
-window.Webflow.push(async () => {
+const initializeApp = async () => {
+  console.log('Initializing app');
   const name = 'Yeebli';
   greetUser(name);
 
@@ -42,7 +42,6 @@ window.Webflow.push(async () => {
     console.error('No auth token or user found');
     return;
   }
-
   // Set auth token for both RouteGuard and FileUploader
   RouteGuard.setAuthToken(authToken);
 
@@ -53,8 +52,8 @@ window.Webflow.push(async () => {
 
   //if pathname is /eventPage, then init the player
   if (window.location.pathname === '/eventpage') {
+    // Add Plyr CSS and JS to the head
     addToHead();
-
     // Get event code from URL
     const urlParams = new URLSearchParams(window.location.search);
     const eventCode = urlParams.get('code');
@@ -93,8 +92,24 @@ window.Webflow.push(async () => {
       console.error('Error fetching event data:', error);
     }
   }
+};
+
+// Initialize Webflow
+window.Webflow ||= [];
+window.Webflow.push(() => {
+  console.log('Webflow loaded');
+  // Check if DOM is already loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  } else {
+    // DOM is already loaded, run initialization immediately
+    initializeApp();
+  }
 });
 
+/**
+ * Add Plyr CSS and JS to the head
+ */
 const addToHead = () => {
   /**Attach Plyr css to head */
   const plyrCss = document.createElement('link');
@@ -112,23 +127,22 @@ const setupMetadata = (eventData: EventData) => {
   if (event_page_name) {
     event_page_name.textContent = eventData.event_name;
   } else {
-    console.warn('No event_page_name found');
+    console.error('No event_page_name found');
   }
   if (event_page_date) {
     event_page_date.textContent = eventData.event_date;
   } else {
-    console.warn('No event_page_date found');
+    console.error('No event_page_date found');
   }
   if (event_page_start_time) {
     event_page_start_time.textContent = eventData.start_time;
   } else {
-    console.warn('No event_page_start_time found');
+    console.error('No event_page_start_time found');
   }
 };
 
 const initializePlayer = (video: HTMLElement, eventData: EventData) => {
-  console.log('Initializing player with video element:', video);
-  console.log('Event data for player:', eventData);
+  console.log({ video, eventData });
 
   // Use the presigned URL from the asset
   const videoUrl = eventData.asset.presignedUrl;

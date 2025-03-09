@@ -15,8 +15,7 @@ interface EventData {
  * @param eventData - Event data containing the video URL
  */
 export const initializePlayer = (video: HTMLVideoElement, eventData: EventData) => {
-  console.log('Initializing player with video element:', video);
-  console.log('Event data for player:', eventData);
+  console.log({ video, eventData });
 
   // Use the presigned URL from the asset
   const videoUrl = eventData.asset.presignedUrl;

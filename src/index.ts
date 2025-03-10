@@ -156,6 +156,9 @@ const initializePlayer = (video: HTMLElement, eventData: EventData) => {
 const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) => {
   const countdownElement = document.querySelector('[wized="countdown_timer"]') as HTMLElement;
   const countdown_wrapper = document.querySelector('[wized="countdown_wrapper"]') as HTMLElement;
+  const event_finished_wrapper = document.querySelector(
+    '[wized="event_finished_wrapper"]'
+  ) as HTMLElement;
 
   if (!countdownElement) {
     console.error('No countdown element found');
@@ -169,21 +172,37 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     console.error('No video element found');
     return;
   }
+  if (!event_finished_wrapper) {
+    console.error('No event finished wrapper found');
+    return;
+  }
 
-  const eventDate = new Date(eventData.event_date + ' ' + eventData.start_time);
+  const eventStartDate = new Date(eventData.event_date + ' ' + eventData.start_time);
+  const eventEndDate = new Date(eventData.event_date + ' ' + eventData.end_time);
+  const now = new Date();
 
-  // IF DATE HAS PASSED, HIDE COUNTDOWN AND SHOW THE PLAYER
-  if (eventDate < new Date()) {
-    countdown_wrapper.style.display = 'none';
+  // Hide all elements initially
+  countdown_wrapper.style.display = 'none';
+  videoElement.style.display = 'none';
+  event_finished_wrapper.style.display = 'none';
+
+  // If event has ended
+  if (now > eventEndDate) {
+    event_finished_wrapper.style.display = 'block';
+    console.log('Event has ended, showing finished message');
+  }
+  // If event is ongoing (between start and end)
+  else if (now > eventStartDate) {
     videoElement.style.display = 'flex';
-    console.log('Date has passed, showing player');
-    // Initialize player with event data
+    console.log('Event is ongoing, showing player');
     initializePlayer(videoElement, eventData);
-  } else {
+  }
+  // If event hasn't started yet
+  else {
     countdown_wrapper.style.display = 'block';
-    videoElement.style.display = 'none';
+    console.log('Event has not started, showing countdown');
 
-    const countdown = new Countdown(countdownElement, eventDate, {
+    const countdown = new Countdown(countdownElement, eventStartDate, {
       threshold: '0',
       reset: 'false',
       onEnd: () => {
@@ -191,6 +210,15 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
         videoElement.style.display = 'flex';
         // Initialize player when countdown ends
         initializePlayer(videoElement, eventData);
+
+        // Set up end time check
+        const endCheckInterval = setInterval(() => {
+          if (new Date() > eventEndDate) {
+            clearInterval(endCheckInterval);
+            videoElement.style.display = 'none';
+            event_finished_wrapper.style.display = 'block';
+          }
+        }, 1000);
       },
     });
 

@@ -15,8 +15,6 @@ interface EventData {
  * @param eventData - Event data containing the video URL
  */
 export const initializePlayer = (video: HTMLVideoElement, eventData: EventData) => {
-  console.log({ video, eventData });
-
   // Use the presigned URL from the asset
   const videoUrl = eventData.asset.presignedUrl;
 
@@ -26,7 +24,6 @@ export const initializePlayer = (video: HTMLVideoElement, eventData: EventData) 
     hls.loadSource(videoUrl);
     hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      console.log('HLS manifest parsed successfully');
       video.play();
     });
 

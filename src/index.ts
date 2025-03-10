@@ -1,3 +1,4 @@
+import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
 import { greetUser } from '$utils/greet';
 import { RouteGuard } from '$utils/routeGuards';
@@ -28,10 +29,23 @@ interface EventData {
   asset: Asset;
 }
 
+/**
+ * Add Plyr CSS and JS to the head
+ */
+function addToHead(): void {
+  // Check if Plyr CSS is already added
+  if (!document.querySelector('link[href*="plyr.css"]')) {
+    const plyrCss = document.createElement('link');
+    plyrCss.href = 'https://cdn.plyr.io/3.7.8/plyr.css';
+    plyrCss.rel = 'stylesheet';
+    document.head.appendChild(plyrCss);
+  }
+}
+
 const initializeApp = async () => {
   console.log('Initializing app');
-  const name = 'Yeebli';
-  greetUser(name);
+
+  greetUser();
 
   // Get auth tokens from cookies
   const cookies = document.cookie.split(';');
@@ -79,15 +93,14 @@ const initializeApp = async () => {
       const eventData: EventData = await response.json();
       console.log('Event data:', eventData);
 
-      const video = document.querySelector('[wized="video_player"]');
+      const video = document.querySelector('[wized="video_player"]') as HTMLElement;
       setupMetadata(eventData);
       if (!video) {
         console.error('No video found');
         return;
       }
-
-      // Initialize player with event data
-      initializePlayer(video as HTMLElement, eventData);
+      // Initialize countdown with event data
+      initializeCountdown(eventData, video);
     } catch (error) {
       console.error('Error fetching event data:', error);
     }
@@ -106,18 +119,6 @@ window.Webflow.push(() => {
     initializeApp();
   }
 });
-
-/**
- * Add Plyr CSS and JS to the head
- */
-const addToHead = () => {
-  /**Attach Plyr css to head */
-  const plyrCss = document.createElement('link');
-  plyrCss.href = 'https://cdn.plyr.io/3.7.8/plyr.css';
-  plyrCss.rel = 'stylesheet';
-  document.head.appendChild(plyrCss);
-  /**Attach Plyr js to head */
-};
 
 const setupMetadata = (eventData: EventData) => {
   const event_page_name = document.querySelector('[wized="event_page_name"]');
@@ -149,4 +150,51 @@ const initializePlayer = (video: HTMLElement, eventData: EventData) => {
 
   const player = new Video(videoUrl, video);
   console.log('Player instance:', player);
+  return { player, videoElement: video };
+};
+
+const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) => {
+  const countdownElement = document.querySelector('[wized="countdown_timer"]') as HTMLElement;
+  const countdown_wrapper = document.querySelector('[wized="countdown_wrapper"]') as HTMLElement;
+
+  if (!countdownElement) {
+    console.error('No countdown element found');
+    return;
+  }
+  if (!countdown_wrapper) {
+    console.error('No countdown wrapper found');
+    return;
+  }
+  if (!videoElement) {
+    console.error('No video element found');
+    return;
+  }
+
+  const eventDate = new Date(eventData.event_date + ' ' + eventData.start_time);
+
+  // IF DATE HAS PASSED, HIDE COUNTDOWN AND SHOW THE PLAYER
+  if (eventDate < new Date()) {
+    countdown_wrapper.style.display = 'none';
+    videoElement.style.display = 'flex';
+    console.log('Date has passed, showing player');
+    // Initialize player with event data
+    initializePlayer(videoElement, eventData);
+  } else {
+    countdown_wrapper.style.display = 'block';
+    videoElement.style.display = 'none';
+
+    const countdown = new Countdown(countdownElement, eventDate, {
+      threshold: '0',
+      reset: 'false',
+      onEnd: () => {
+        countdown_wrapper.style.display = 'none';
+        videoElement.style.display = 'flex';
+        // Initialize player when countdown ends
+        initializePlayer(videoElement, eventData);
+      },
+    });
+
+    countdown.start();
+    console.log('Countdown started');
+  }
 };

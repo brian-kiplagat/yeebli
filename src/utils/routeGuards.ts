@@ -53,7 +53,7 @@ export class RouteGuard {
 
     const data = await response.json();
     const userObject = data.data.user;
-    console.log(userObject);
+    console.warn(userObject);
     return true;
   }
 
@@ -71,7 +71,6 @@ export class RouteGuard {
     const matchedRoute = this.protectedPaths.find((route) =>
       this.matchPath(route.path, currentPath)
     );
-    console.log(matchedRoute);
 
     if (!matchedRoute) {
       return true; // Path is not protected

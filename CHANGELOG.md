@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.1.12
+
+### Patch Changes
+
+- 208f4a8: fix: aassets
+- 3561ff0: fix: player
+
 ## 1.1.11
 
 ### Patch Changes

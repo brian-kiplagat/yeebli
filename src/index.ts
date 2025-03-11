@@ -142,30 +142,46 @@ const initializePlayer = (video: HTMLElement, eventData: EventData) => {
 };
 
 const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) => {
-  const countdownElement = document.querySelector('[wized="countdown_timer"]') as HTMLElement;
-  const countdown_wrapper = document.querySelector('[wized="countdown_wrapper"]') as HTMLElement;
-  const event_finished_wrapper = document.querySelector(
+  const countdownElement = document.querySelector<HTMLElement>('[wized="countdown_timer"]');
+  const countdown_wrapper = document.querySelector<HTMLElement>('[wized="countdown_wrapper"]');
+  const event_finished_wrapper = document.querySelector<HTMLElement>(
     '[wized="event_finished_wrapper"]'
-  ) as HTMLElement;
-  const event_status_wrapper = document.querySelector(
+  );
+  const event_status_wrapper = document.querySelector<HTMLElement>(
     '[wized="event_status_wrapper"]'
-  ) as HTMLElement;
-  const event_status_text = document.querySelector('[wized="event_status_text"]') as HTMLElement;
+  );
+  const event_status_text = document.querySelector<HTMLElement>('[wized="event_status_text"]');
+  const chat_collumn = document.querySelector<HTMLElement>('[wized="chat_collumn"]');
+  const interested_wrapper = document.querySelector<HTMLElement>('[wized="interested_wrapper"]');
 
-  const elements = [
-    { element: countdownElement, name: 'countdown element' },
-    { element: countdown_wrapper, name: 'countdown wrapper' },
-    { element: videoElement, name: 'video element' },
-    { element: event_finished_wrapper, name: 'event finished wrapper' },
-    { element: event_status_wrapper, name: 'event status wrapper' },
-    { element: event_status_text, name: 'event status text' },
-  ];
-
-  for (const { element, name } of elements) {
-    if (!element) {
-      console.error(`No ${name} found`);
-      return;
-    }
+  // Check each element individually and log specific errors
+  if (!countdownElement) {
+    console.error('Missing element: [wized="countdown_timer"]');
+    return;
+  }
+  if (!countdown_wrapper) {
+    console.error('Missing element: [wized="countdown_wrapper"]');
+    return;
+  }
+  if (!event_finished_wrapper) {
+    console.error('Missing element: [wized="event_finished_wrapper"]');
+    return;
+  }
+  if (!event_status_wrapper) {
+    console.error('Missing element: [wized="event_status_wrapper"]');
+    return;
+  }
+  if (!event_status_text) {
+    console.error('Missing element: [wized="event_status_text"]');
+    return;
+  }
+  if (!chat_collumn) {
+    console.error('Missing element: [wized="chat_collumn"]');
+    return;
+  }
+  if (!interested_wrapper) {
+    console.error('Missing element: [wized="interested_wrapper"]');
+    return;
   }
 
   const eventStartDate = new Date(eventData.event_date + ' ' + eventData.start_time);
@@ -185,6 +201,8 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     event_status_text.textContent = `Event Ended ${eventData.event_date} ${eventData.end_time}`;
     event_status_wrapper.classList.remove('case_live', 'case_early');
     event_status_wrapper.classList.add('case_ended');
+    chat_collumn.style.display = 'none';
+    interested_wrapper.style.display = 'none';
   }
   // If event is ongoing (between start and end)
   else if (now > eventStartDate) {
@@ -193,6 +211,8 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     event_status_text.textContent = `Event is live`;
     event_status_wrapper.classList.remove('case_ended', 'case_early');
     event_status_wrapper.classList.add('case_live');
+    chat_collumn.style.display = 'flex';
+    interested_wrapper.style.display = 'flex';
     initializePlayer(videoElement, eventData);
   }
   // If event hasn't started yet
@@ -202,6 +222,8 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     event_status_text.textContent = `Event starts ${eventData.event_date} ${eventData.start_time}`;
     event_status_wrapper.classList.remove('case_ended', 'case_live');
     event_status_wrapper.classList.add('case_early');
+    chat_collumn.style.display = 'none';
+    interested_wrapper.style.display = 'none';
     const countdown = new Countdown(countdownElement, eventStartDate, {
       threshold: '0',
       reset: 'false',

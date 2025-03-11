@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.14
+
+### Patch Changes
+
+- 8371e16: fix: events
+
 ## 1.1.13
 
 ### Patch Changes

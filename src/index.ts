@@ -122,23 +122,11 @@ window.Webflow.push(() => {
 
 const setupMetadata = (eventData: EventData) => {
   const event_page_name = document.querySelector('[wized="event_page_name"]');
-  const event_page_date = document.querySelector('[wized="event_page_date"]');
-  const event_page_start_time = document.querySelector('[wized="event_page_start"]');
 
   if (event_page_name) {
     event_page_name.textContent = eventData.event_name;
   } else {
     console.error('No event_page_name found');
-  }
-  if (event_page_date) {
-    event_page_date.textContent = eventData.event_date;
-  } else {
-    console.error('No event_page_date found');
-  }
-  if (event_page_start_time) {
-    event_page_start_time.textContent = eventData.start_time;
-  } else {
-    console.error('No event_page_start_time found');
   }
 };
 
@@ -159,26 +147,30 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
   const event_finished_wrapper = document.querySelector(
     '[wized="event_finished_wrapper"]'
   ) as HTMLElement;
+  const event_status_wrapper = document.querySelector(
+    '[wized="event_status_wrapper"]'
+  ) as HTMLElement;
+  const event_status_text = document.querySelector('[wized="event_status_text"]') as HTMLElement;
 
-  if (!countdownElement) {
-    console.error('No countdown element found');
-    return;
-  }
-  if (!countdown_wrapper) {
-    console.error('No countdown wrapper found');
-    return;
-  }
-  if (!videoElement) {
-    console.error('No video element found');
-    return;
-  }
-  if (!event_finished_wrapper) {
-    console.error('No event finished wrapper found');
-    return;
+  const elements = [
+    { element: countdownElement, name: 'countdown element' },
+    { element: countdown_wrapper, name: 'countdown wrapper' },
+    { element: videoElement, name: 'video element' },
+    { element: event_finished_wrapper, name: 'event finished wrapper' },
+    { element: event_status_wrapper, name: 'event status wrapper' },
+    { element: event_status_text, name: 'event status text' },
+  ];
+
+  for (const { element, name } of elements) {
+    if (!element) {
+      console.error(`No ${name} found`);
+      return;
+    }
   }
 
   const eventStartDate = new Date(eventData.event_date + ' ' + eventData.start_time);
   const eventEndDate = new Date(eventData.event_date + ' ' + eventData.end_time);
+
   const now = new Date();
 
   // Hide all elements initially
@@ -190,18 +182,26 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
   if (now > eventEndDate) {
     event_finished_wrapper.style.display = 'block';
     console.log('Event has ended, showing finished message');
+    event_status_text.textContent = `Event Ended ${eventData.event_date} ${eventData.end_time}`;
+    event_status_wrapper.classList.remove('case_live', 'case_early');
+    event_status_wrapper.classList.add('case_ended');
   }
   // If event is ongoing (between start and end)
   else if (now > eventStartDate) {
     videoElement.style.display = 'flex';
     console.log('Event is ongoing, showing player');
+    event_status_text.textContent = `Event is live`;
+    event_status_wrapper.classList.remove('case_ended', 'case_early');
+    event_status_wrapper.classList.add('case_live');
     initializePlayer(videoElement, eventData);
   }
   // If event hasn't started yet
   else {
     countdown_wrapper.style.display = 'block';
     console.log('Event has not started, showing countdown');
-
+    event_status_text.textContent = `Event starts ${eventData.event_date} ${eventData.start_time}`;
+    event_status_wrapper.classList.remove('case_ended', 'case_live');
+    event_status_wrapper.classList.add('case_early');
     const countdown = new Countdown(countdownElement, eventStartDate, {
       threshold: '0',
       reset: 'false',

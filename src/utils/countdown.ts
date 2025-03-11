@@ -110,7 +110,7 @@ export class Countdown {
     const seconds = this.remaining % 60;
 
     // Update countdown display with formatted time
-    const timeString = `${this.formatNumber(hours)}:${this.formatNumber(minutes)}:${this.formatNumber(seconds)}`;
+    const timeString = `${this.formatNumber(hours)} h : ${this.formatNumber(minutes)} m : ${this.formatNumber(seconds)} s`;
     this.countdownElement.textContent = timeString;
 
     if (this.remaining > 0) {

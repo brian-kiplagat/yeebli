@@ -35,7 +35,13 @@ export class RouteGuard {
   }
 
   private static async isAuthenticated(): Promise<boolean> {
+    // Don't redirect if we're already on onboarding pages
+    if (window.location.pathname.startsWith('/onboarding')) {
+      return true;
+    }
+
     if (!this.authToken) {
+      window.location.href = '/onboarding/login?error=unauthorized';
       return false;
     }
 

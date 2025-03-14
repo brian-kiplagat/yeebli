@@ -52,57 +52,57 @@ const initializeApp = async () => {
   const authToken = cookies.find((cookie) => cookie.trim().startsWith('token='))?.split('=')[1];
   const user = cookies.find((cookie) => cookie.trim().startsWith('user='))?.split('=')[1];
 
-  if (!authToken || !user) {
-    console.error('No auth token or user found');
-    return;
-  }
-  // Set auth token for both RouteGuard and FileUploader
-  RouteGuard.setAuthToken(authToken);
+  // Set auth token for RouteGuard (even if null) and let it handle the auth check
+  RouteGuard.setAuthToken(authToken || '');
+  await RouteGuard.checkAccess();
 
-  //if pathname is /host/dashboard-host-view-assets, then initialize the file upload
-  if (window.location.pathname === '/host/dashboard-host-view-assets') {
-    initializeFileUpload(authToken);
-  }
-
-  //if pathname is /eventPage, then init the player
-  if (window.location.pathname === '/eventpage') {
-    // Add Plyr CSS and JS to the head
-    addToHead();
-    // Get event code from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventCode = urlParams.get('code');
-
-    if (!eventCode) {
-      console.error('No event code found in URL');
-      return;
+  // Only continue with initialization if we have valid auth
+  if (authToken && user) {
+    //if pathname is /host/dashboard-host-view-assets, then initialize the file upload
+    if (window.location.pathname === '/host/dashboard-host-view-assets') {
+      initializeFileUpload(authToken);
     }
 
-    try {
-      // Fetch event data
-      const response = await fetch(`https://api.3themind.com/v1/event/${eventCode}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+    //if pathname is /eventPage, then init the player
+    if (window.location.pathname === '/eventpage') {
+      // Add Plyr CSS and JS to the head
+      addToHead();
+      // Get event code from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const eventCode = urlParams.get('code');
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch event data');
-      }
-
-      const eventData: EventData = await response.json();
-      console.log('Event data:', eventData);
-
-      const video = document.querySelector('[wized="video_player"]') as HTMLElement;
-      setupMetadata(eventData);
-      if (!video) {
-        console.error('No video found');
+      if (!eventCode) {
+        console.error('No event code found in URL');
         return;
       }
-      // Initialize countdown with event data
-      initializeCountdown(eventData, video);
-    } catch (error) {
-      console.error('Error fetching event data:', error);
+
+      try {
+        // Fetch event data
+        const response = await fetch(`https://api.3themind.com/v1/event/${eventCode}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch event data');
+        }
+
+        const eventData: EventData = await response.json();
+        console.log('Event data:', eventData);
+
+        const video = document.querySelector('[wized="video_player"]') as HTMLElement;
+        setupMetadata(eventData);
+        if (!video) {
+          console.error('No video found');
+          return;
+        }
+        // Initialize countdown with event data
+        initializeCountdown(eventData, video);
+      } catch (error) {
+        console.error('Error fetching event data:', error);
+      }
     }
   }
 };

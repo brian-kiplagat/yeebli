@@ -10,23 +10,23 @@ export class VideoModal {
     // Initialize MutationObserver
     this.observer = new MutationObserver(this.handleDOMChanges.bind(this));
 
-    // Start observing
-    this.observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    // Also try initial setup in case elements are already present
-    this.initializeAssetPreviews();
+    // Find the container and start observing
+    const container = document.querySelector('[wized="case_container"]');
+    if (container) {
+      this.observer.observe(container, {
+        childList: true,
+        subtree: true,
+      });
+    } else {
+      console.warn('Could not find case container element');
+    }
   }
 
   private handleDOMChanges(mutations: MutationRecord[]) {
     for (const mutation of mutations) {
       if (mutation.addedNodes.length) {
-        // Check if any of the added nodes are our target elements
         mutation.addedNodes.forEach((node) => {
           if (node instanceof HTMLElement) {
-            // Check for elements within the added node
             const previews = node.querySelectorAll('[wized="asset_image_preview"]');
             if (previews.length > 0) {
               this.setupPreviewElements(previews);
@@ -47,12 +47,6 @@ export class VideoModal {
     }
   }
 
-  private initializeAssetPreviews(): void {
-    const assetPreviews = document.querySelectorAll('[wized="asset_image_preview"]');
-    console.log('Initial preview elements found:', assetPreviews.length);
-    this.setupPreviewElements(assetPreviews);
-  }
-
   private setupPreviewElements(elements: NodeListOf<Element>): void {
     elements.forEach((preview) => {
       // Check if we've already set up this element
@@ -63,28 +57,16 @@ export class VideoModal {
       // Mark as initialized
       preview.setAttribute('data-video-modal-initialized', 'true');
 
-      const parentAnchor = preview.closest('a');
-      if (parentAnchor) {
-        parentAnchor.addEventListener('click', (e) => {
-          e.preventDefault();
-          const videoUrl = preview.getAttribute('presigned');
-          if (videoUrl) {
-            console.log('Opening video:', videoUrl);
-            this.openVideoModal(videoUrl);
-          } else {
-            console.warn('No presigned URL found for video preview', preview);
-          }
-        });
-      } else {
-        preview.addEventListener('click', () => {
-          const videoUrl = preview.getAttribute('presigned');
-          if (videoUrl) {
-            this.openVideoModal(videoUrl);
-          } else {
-            console.warn('No presigned URL found for video preview', preview);
-          }
-        });
-      }
+      // Add click handler directly to the preview element
+      preview.addEventListener('click', () => {
+        const videoUrl = preview.getAttribute('presigned');
+        if (videoUrl) {
+          console.log('Opening video:', videoUrl);
+          this.openVideoModal(videoUrl);
+        } else {
+          console.warn('No presigned URL found for video preview', preview);
+        }
+      });
     });
   }
 
@@ -115,6 +97,7 @@ export class VideoModal {
       maxWidth: '80vw',
       maxHeight: '80vh',
       objectFit: 'contain',
+      minWidth: '500px',
     });
 
     wrapper.appendChild(video);
@@ -172,19 +155,33 @@ export class VideoModal {
 
     // Setup cleanup function
     const cleanup = () => {
+      // Destroy player and remove its event listeners
       if (this.player) {
         this.player.destroy();
         this.player = null;
       }
-      wrapper.remove();
+
+      // Remove all event listeners
+      closeButton.removeEventListener('click', cleanup);
+      wrapper.removeEventListener('click', handleWrapperClick);
       document.removeEventListener('keydown', handleEscape);
+
+      // Remove elements from DOM
+      wrapper.remove();
+
+      // Clear references
+      video.src = '';
+      video.load();
+    };
+
+    // Separate handler for wrapper clicks
+    const handleWrapperClick = (e: MouseEvent) => {
+      if (e.target === wrapper) cleanup();
     };
 
     // Add event listeners
     closeButton.onclick = cleanup;
-    wrapper.addEventListener('click', (e) => {
-      if (e.target === wrapper) cleanup();
-    });
+    wrapper.addEventListener('click', handleWrapperClick);
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') cleanup();

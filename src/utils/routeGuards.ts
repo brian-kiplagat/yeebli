@@ -48,12 +48,15 @@ export class RouteGuard {
     });
 
     if (!response.ok) {
+      window.location.href = '/onboarding/login?error=unauthorized';
       return false;
     }
 
     const data = await response.json();
     const userObject = data.data.user;
-    console.warn(userObject);
+
+    localStorage.setItem('user', JSON.stringify(userObject));
+
     return true;
   }
 
@@ -83,6 +86,7 @@ export class RouteGuard {
 
     if (requireAuth) {
       const authenticated = await this.isAuthenticated();
+      console.log('authenticated', authenticated);
       if (!authenticated) {
         console.error('not authenticated, kicking out');
         window.location.href = redirectPath;

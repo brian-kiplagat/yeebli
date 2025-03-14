@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.20
+
+### Patch Changes
+
+- 1969bfd: fix: video
+
 ## 1.1.19
 
 ### Patch Changes

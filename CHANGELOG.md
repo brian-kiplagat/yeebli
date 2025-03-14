@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.18
+
+### Patch Changes
+
+- f829c52: fix: seek
+
 ## 1.1.17
 
 ### Patch Changes

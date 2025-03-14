@@ -7,11 +7,20 @@ export class Video {
   private player: Plyr | null = null;
   private hls: Hls | null = null;
   private test_url = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+  private readonly STORAGE_KEY: string;
+  private progressInterval: number | null = null;
 
   constructor(
     public media_url: string,
     public context: HTMLElement
   ) {
+    // Extract event code from URL if it exists
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventCode = urlParams.get('code') || '';
+
+    // Create a unique storage key based on the event code and video ID
+    this.STORAGE_KEY = `video_progress_${eventCode}`;
+
     this.setupVideo(media_url, context);
   }
 
@@ -34,13 +43,39 @@ export class Video {
 
     const controls = [
       'play-large', // The large play button in the center
-
       'mute', // Toggle mute
       'volume', // Volume control
       'captions', // Toggle captions
-
       'fullscreen', // Toggle fullscreen
     ];
+
+    const initializePlayer = (videoElement: HTMLVideoElement) => {
+      this.player = new Plyr(videoElement, { autoplay: true, muted: true, controls });
+
+      // Restore last playback position
+      const savedProgress = localStorage.getItem(this.STORAGE_KEY);
+      if (savedProgress) {
+        const progress = parseFloat(savedProgress);
+        videoElement.currentTime = progress;
+      }
+
+      // Save progress periodically
+      this.progressInterval = window.setInterval(() => {
+        if (videoElement.currentTime > 0) {
+          localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());
+        }
+      }, 1000) as unknown as number;
+
+      // Save progress on pause
+      this.player.on('pause', () => {
+        localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());
+      });
+
+      // Save progress before unload
+      window.addEventListener('beforeunload', () => {
+        localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());
+      });
+    };
 
     // Check if the video URL is an HLS stream (.m3u8)
     if (Hls.isSupported() && media_url.endsWith('.m3u8')) {
@@ -52,7 +87,7 @@ export class Video {
       // Handle HLS manifest parsed event
       this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log('HLS manifest parsed successfully');
-        this.player = new Plyr(video, { autoplay: true, muted: true, controls });
+        initializePlayer(video);
         video.play();
       });
 
@@ -79,23 +114,29 @@ export class Video {
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Fallback for Safari which has native HLS support
       video.src = media_url;
-      this.player = new Plyr(video, { autoplay: true, muted: true, controls });
+      initializePlayer(video);
       video.addEventListener('loadedmetadata', () => {
         video.play();
       });
     } else {
       // Regular video playback
       video.setAttribute('src', media_url);
-      this.player = new Plyr(video, { autoplay: true, muted: true, controls });
+      initializePlayer(video);
       console.log('Regular video player initialized');
     }
 
     const cleanup = () => {
+      if (this.progressInterval) {
+        clearInterval(this.progressInterval);
+        this.progressInterval = null;
+      }
       if (this.hls) {
         this.hls.destroy();
         this.hls = null;
       }
       if (this.player) {
+        // Save final position before cleanup
+        localStorage.setItem(this.STORAGE_KEY, video.currentTime.toString());
         this.player.destroy();
         this.player = null;
       }
@@ -111,11 +152,17 @@ export class Video {
   }
 
   private cleanup(): void {
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
     if (this.hls) {
       this.hls.destroy();
       this.hls = null;
     }
     if (this.player) {
+      // Save final position before cleanup
+      localStorage.setItem(this.STORAGE_KEY, this.player.currentTime.toString());
       this.player.destroy();
       this.player = null;
     }

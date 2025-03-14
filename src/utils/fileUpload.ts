@@ -134,15 +134,16 @@ export class FileUploader {
       }
 
       const file = fileInput.files[0];
-      let duration: number | undefined;
+      let duration: number = 0;
 
       // Get duration if it's a video file
       if (file.type.startsWith('video/')) {
         try {
           duration = await this.getVideoDuration(file);
+          duration = Math.ceil(duration);
           // Dispatch video metadata event
           const metadataEvent = new CustomEvent('videoMetadataLoaded', {
-            detail: { duration: duration.toFixed(2) },
+            detail: { duration: duration },
           });
           document.dispatchEvent(metadataEvent);
         } catch (error) {
@@ -233,7 +234,7 @@ export class FileUploader {
     contentType: string,
     assetType: string,
     fileSize: number,
-    duration?: number
+    duration: number
   ): Promise<PresignedUrlResponse> {
     if (!this.authToken) {
       throw new Error('Authentication token not set');
@@ -250,7 +251,7 @@ export class FileUploader {
         contentType,
         assetType,
         fileSize,
-        duration,
+        duration: Math.ceil(duration),
       }),
     });
 

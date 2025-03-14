@@ -232,7 +232,8 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
         videoElement.style.display = 'flex';
         // Initialize player when countdown ends
         initializePlayer(videoElement, eventData);
-
+        event_status_wrapper.classList.remove('case_ended', 'case_early');
+        event_status_wrapper.classList.add('case_live');
         // Set up end time check
         const endCheckInterval = setInterval(() => {
           if (new Date() > eventEndDate) {

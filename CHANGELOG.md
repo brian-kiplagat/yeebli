@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.15
+
+### Patch Changes
+
+- ae87777: fix: token
+
 ## 1.1.14
 
 ### Patch Changes

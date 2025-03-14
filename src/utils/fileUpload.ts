@@ -8,6 +8,7 @@ interface UploadResult {
   url?: string;
   error?: string;
   progress?: number;
+  duration?: number;
 }
 
 export class FileUploader {
@@ -98,6 +99,30 @@ export class FileUploader {
   }
 
   /**
+   * Gets the duration of a video file
+   * @param file - The video file to get duration for
+   * @returns Promise<number> - The duration in seconds
+   */
+  private static getVideoDuration(file: File): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(video.src);
+        resolve(video.duration);
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src);
+        reject(new Error('Failed to load video metadata'));
+      };
+
+      video.src = URL.createObjectURL(file);
+    });
+  }
+
+  /**
    * Handles file upload to S3 using presigned URL with progress tracking
    * @param fileInput - The file input element with wized="file_uploader"
    * @returns Promise<UploadResult>
@@ -109,7 +134,22 @@ export class FileUploader {
       }
 
       const file = fileInput.files[0];
-      //aset tyope can be only "image" | "video" | "audio" | "document"
+      let duration: number | undefined;
+
+      // Get duration if it's a video file
+      if (file.type.startsWith('video/')) {
+        try {
+          duration = await this.getVideoDuration(file);
+          // Dispatch video metadata event
+          const metadataEvent = new CustomEvent('videoMetadataLoaded', {
+            detail: { duration: duration.toFixed(2) },
+          });
+          document.dispatchEvent(metadataEvent);
+        } catch (error) {
+          console.warn('Failed to get video duration:', error);
+        }
+      }
+
       const assetType = file.type.startsWith('image/')
         ? 'image'
         : file.type.startsWith('video/')
@@ -123,7 +163,8 @@ export class FileUploader {
         file.name,
         file.type,
         assetType,
-        file.size
+        file.size,
+        duration
       );
 
       // Upload file using XMLHttpRequest for progress tracking
@@ -155,6 +196,7 @@ export class FileUploader {
               success: true,
               url: presignedUrlResponse.url,
               progress: 100,
+              duration,
             });
           } else {
             reject(new Error('Failed to upload file to S3'));
@@ -190,7 +232,8 @@ export class FileUploader {
     fileName: string,
     contentType: string,
     assetType: string,
-    fileSize: number
+    fileSize: number,
+    duration?: number
   ): Promise<PresignedUrlResponse> {
     if (!this.authToken) {
       throw new Error('Authentication token not set');
@@ -207,6 +250,7 @@ export class FileUploader {
         contentType,
         assetType,
         fileSize,
+        duration,
       }),
     });
 

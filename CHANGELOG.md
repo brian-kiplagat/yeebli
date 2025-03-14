@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.19
+
+### Patch Changes
+
+- 431c623: fix: assets
+
 ## 1.1.18
 
 ### Patch Changes

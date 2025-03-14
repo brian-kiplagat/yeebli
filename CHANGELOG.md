@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.16
+
+### Patch Changes
+
+- a5e3bac: fix: wrapper
+
 ## 1.1.15
 
 ### Patch Changes

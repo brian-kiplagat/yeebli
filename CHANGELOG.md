@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.17
+
+### Patch Changes
+
+- 0b20628: fix: video
+
 ## 1.1.16
 
 ### Patch Changes

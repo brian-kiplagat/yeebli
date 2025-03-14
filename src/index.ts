@@ -202,7 +202,7 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     event_status_wrapper.classList.remove('case_live', 'case_early');
     event_status_wrapper.classList.add('case_ended');
     chat_collumn.style.display = 'none';
-    interested_wrapper.style.display = 'none';
+    interested_wrapper.style.display = 'flex';
   }
   // If event is ongoing (between start and end)
   else if (now > eventStartDate) {
@@ -223,7 +223,7 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     event_status_wrapper.classList.remove('case_ended', 'case_live');
     event_status_wrapper.classList.add('case_early');
     chat_collumn.style.display = 'none';
-    interested_wrapper.style.display = 'none';
+    interested_wrapper.style.display = 'flex';
     const countdown = new Countdown(countdownElement, eventStartDate, {
       threshold: '0',
       reset: 'false',

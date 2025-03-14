@@ -3,6 +3,7 @@ import { initializeFileUpload } from '$utils/fileUpload';
 import { greetUser } from '$utils/greet';
 import { RouteGuard } from '$utils/routeGuards';
 import { Video } from '$utils/video';
+import { VideoModal } from '$utils/videoModal';
 
 interface Asset {
   id: number;
@@ -61,6 +62,9 @@ const initializeApp = async () => {
     //if pathname is /host/dashboard-host-view-assets, then initialize the file upload
     if (window.location.pathname === '/host/dashboard-host-view-assets') {
       initializeFileUpload(authToken);
+      // Initialize Webflow
+      const videoModal = new VideoModal();
+      videoModal.addToHead();
     }
 
     //if pathname is /eventPage, then init the player

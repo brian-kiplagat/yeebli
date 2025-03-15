@@ -238,6 +238,7 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
         initializePlayer(videoElement, eventData);
         event_status_wrapper.classList.remove('case_ended', 'case_early');
         event_status_wrapper.classList.add('case_live');
+        chat_collumn.style.display = 'flex';
         // Set up end time check
         const endCheckInterval = setInterval(() => {
           if (new Date() > eventEndDate) {

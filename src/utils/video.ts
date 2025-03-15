@@ -26,7 +26,7 @@ export class Video {
 
   private setupVideo(media_url: string, context: HTMLElement): void {
     context.setAttribute('video', 'video-wrapper');
-
+    //media_url = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
     const video = document.createElement('video');
     video.setAttribute('video', 'video-element');
     video.className = 'plyr';
@@ -49,8 +49,9 @@ export class Video {
       'fullscreen', // Toggle fullscreen
     ];
 
-    const initializePlayer = (videoElement: HTMLVideoElement) => {
+    const startPlayback = (videoElement: HTMLVideoElement) => {
       this.player = new Plyr(videoElement, { autoplay: true, muted: true, controls });
+      this.player.muted = true;
 
       // Restore last playback position
       const savedProgress = localStorage.getItem(this.STORAGE_KEY);
@@ -71,6 +72,10 @@ export class Video {
         localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());
       });
 
+      this.player.on('ended', () => {
+        console.log('Video ended');
+      });
+
       // Save progress before unload
       window.addEventListener('beforeunload', () => {
         localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());
@@ -87,8 +92,7 @@ export class Video {
       // Handle HLS manifest parsed event
       this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log('HLS manifest parsed successfully');
-        initializePlayer(video);
-        video.play();
+        startPlayback(video);
       });
 
       // Handle HLS errors
@@ -114,14 +118,14 @@ export class Video {
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Fallback for Safari which has native HLS support
       video.src = media_url;
-      initializePlayer(video);
+
       video.addEventListener('loadedmetadata', () => {
-        video.play();
+        startPlayback(video);
       });
     } else {
       // Regular video playback
       video.setAttribute('src', media_url);
-      initializePlayer(video);
+      startPlayback(video);
       console.log('Regular video player initialized');
     }
 

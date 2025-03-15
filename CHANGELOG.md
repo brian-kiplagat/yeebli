@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.21
+
+### Patch Changes
+
+- d835d45: fix: muted
+
 ## 1.1.20
 
 ### Patch Changes

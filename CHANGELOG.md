@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.1.23
+
+### Patch Changes
+
+- 1581998: fix: class
+- eed9ed7: fix: class
+
 ## 1.1.22
 
 ### Patch Changes

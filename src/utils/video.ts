@@ -93,11 +93,6 @@ export class Video {
           event_ending_expiry.style.display = 'flex';
           event_ending_in.textContent = `Event ends in ${timeLeft}`;
         }
-        //if time left is 0 or less, show event ended
-        if (timeLeft <= 0) {
-          event_ending_expiry.style.display = 'flex';
-          event_ending_in.textContent = 'Event ended';
-        }
       });
 
       // Save progress before unload

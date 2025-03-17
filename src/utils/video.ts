@@ -71,9 +71,23 @@ export class Video {
       this.player.on('pause', () => {
         localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());
       });
-
       this.player.on('ended', () => {
         console.log('Video ended');
+      });
+
+      const event_ending_in = document.querySelector<HTMLElement>('[wized="event_ending_in"]');
+      const event_ending_expiry = document.querySelector<HTMLElement>(
+        '[wized="event_ending_expiry"]'
+      );
+      this.player.on('timeupdate', () => {
+        if (!this.player) return;
+        const currentTime = this.player.currentTime || 0;
+        const duration = this.player.duration || 0;
+        const timeLeft = Math.round(duration - currentTime);
+        if (event_ending_in && event_ending_expiry && timeLeft <= 10 && timeLeft > 0) {
+          event_ending_expiry.style.display = 'flex';
+          event_ending_in.textContent = `Event ends in ${timeLeft}`;
+        }
       });
 
       // Save progress before unload

@@ -1,0 +1,74 @@
+export interface EventData {
+  id: number;
+  event_name: string;
+  event_description: string;
+  event_date: string;
+  start_time: string;
+  end_time: string;
+  asset_id: number;
+  created_at: string;
+  updated_at: string;
+  host_id: number;
+  asset: Asset;
+}
+
+export interface Asset {
+  id: number;
+  asset_name: string;
+  asset_type: string;
+  asset_url: string;
+  asset_size: number;
+  duration: number | null;
+  hls_url: string | null;
+  processing_status: string;
+  created_at: string;
+  updated_at: string;
+  user_id: number;
+  presignedUrl: string;
+}
+
+export class EventStatus {
+  private event_status_text: HTMLElement | null;
+  private event_status_wrapper: HTMLElement | null;
+  private chat_collumn: HTMLElement | null;
+  private interested_wrapper: HTMLElement | null;
+
+  constructor() {
+    this.event_status_text = document.querySelector<HTMLElement>('[wized="event_status_text"]');
+    this.event_status_wrapper = document.querySelector<HTMLElement>(
+      '[wized="event_status_wrapper"]'
+    );
+    this.chat_collumn = document.querySelector<HTMLElement>('[wized="chat_collumn"]');
+    this.interested_wrapper = document.querySelector<HTMLElement>('[wized="interested_wrapper"]');
+  }
+
+  updateStatus(eventData: EventData, status: 'ended' | 'live' | 'early', countdown?: number): void {
+    if (!this.event_status_text || !this.event_status_wrapper) return;
+
+    switch (status) {
+      case 'ended':
+        this.event_status_text.textContent = `Event Ended ${eventData.event_date} ${eventData.end_time}`;
+        this.event_status_wrapper.classList.remove('case_live', 'case_early');
+        this.event_status_wrapper.classList.add('case_ended');
+        if (this.chat_collumn) this.chat_collumn.style.display = 'none';
+        if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
+        break;
+      case 'live':
+        this.event_status_text.textContent = countdown
+          ? `Event ending in ${countdown}`
+          : 'Event is live';
+        this.event_status_wrapper.classList.remove('case_ended', 'case_early');
+        this.event_status_wrapper.classList.add('case_live');
+        if (this.chat_collumn) this.chat_collumn.style.display = 'flex';
+        if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
+        break;
+      case 'early':
+        this.event_status_text.textContent = `Event starts ${eventData.event_date} ${eventData.start_time}`;
+        this.event_status_wrapper.classList.remove('case_ended', 'case_live');
+        this.event_status_wrapper.classList.add('case_early');
+        if (this.chat_collumn) this.chat_collumn.style.display = 'none';
+        if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
+        break;
+    }
+  }
+}

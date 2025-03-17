@@ -5,30 +5,8 @@ import { RouteGuard } from '$utils/routeGuards';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
 
-interface Asset {
-  id: number;
-  asset_name: string;
-  asset_type: string;
-  asset_url: string;
-  created_at: string;
-  updated_at: string;
-  user_id: number;
-  presignedUrl: string;
-}
-
-interface EventData {
-  id: number;
-  event_name: string;
-  event_description: string;
-  event_date: string;
-  start_time: string;
-  end_time: string;
-  asset_id: number;
-  created_at: string;
-  updated_at: string;
-  host_id: number;
-  asset: Asset;
-}
+import type { EventData } from './utils/eventStatus';
+import { EventStatus } from './utils/eventStatus';
 
 /**
  * Add Plyr CSS and JS to the head
@@ -151,12 +129,6 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
   const event_finished_wrapper = document.querySelector<HTMLElement>(
     '[wized="event_finished_wrapper"]'
   );
-  const event_status_wrapper = document.querySelector<HTMLElement>(
-    '[wized="event_status_wrapper"]'
-  );
-  const event_status_text = document.querySelector<HTMLElement>('[wized="event_status_text"]');
-  const chat_collumn = document.querySelector<HTMLElement>('[wized="chat_collumn"]');
-  const interested_wrapper = document.querySelector<HTMLElement>('[wized="interested_wrapper"]');
 
   // Check each element individually and log specific errors
   if (!countdownElement) {
@@ -171,27 +143,13 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     console.error('Missing element: [wized="event_finished_wrapper"]');
     return;
   }
-  if (!event_status_wrapper) {
-    console.error('Missing element: [wized="event_status_wrapper"]');
-    return;
-  }
-  if (!event_status_text) {
-    console.error('Missing element: [wized="event_status_text"]');
-    return;
-  }
-  if (!chat_collumn) {
-    console.error('Missing element: [wized="chat_collumn"]');
-    return;
-  }
-  if (!interested_wrapper) {
-    console.error('Missing element: [wized="interested_wrapper"]');
-    return;
-  }
 
   const eventStartDate = new Date(eventData.event_date + ' ' + eventData.start_time);
   const eventEndDate = new Date(eventData.event_date + ' ' + eventData.end_time);
-
   const now = new Date();
+
+  // Initialize event status handler
+  const eventStatus = new EventStatus();
 
   // Hide all elements initially
   countdown_wrapper.style.display = 'none';
@@ -201,56 +159,38 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
   // If event has ended
   if (now > eventEndDate) {
     event_finished_wrapper.style.display = 'block';
-    console.log('Event has ended, showing finished message');
-    event_status_text.textContent = `Event Ended ${eventData.event_date} ${eventData.end_time}`;
-    event_status_wrapper.classList.remove('case_live', 'case_early');
-    event_status_wrapper.classList.add('case_ended');
-    chat_collumn.style.display = 'none';
-    interested_wrapper.style.display = 'flex';
+    eventStatus.updateStatus(eventData, 'ended');
   }
-  // If event is ongoing (between start and end)
+  // If event is ongoing
   else if (now > eventStartDate) {
     videoElement.style.display = 'flex';
-    console.log('Event is ongoing, showing player');
-    event_status_text.textContent = `Event is live`;
-    event_status_wrapper.classList.remove('case_ended', 'case_early');
-    event_status_wrapper.classList.add('case_live');
-    chat_collumn.style.display = 'flex';
-    interested_wrapper.style.display = 'flex';
+    eventStatus.updateStatus(eventData, 'live');
     initializePlayer(videoElement, eventData);
   }
-  // If event hasn't started yet
+  // If event hasn't started
   else {
     countdown_wrapper.style.display = 'block';
-    console.log('Event has not started, showing countdown');
-    event_status_text.textContent = `Event starts ${eventData.event_date} ${eventData.start_time}`;
-    event_status_wrapper.classList.remove('case_ended', 'case_live');
-    event_status_wrapper.classList.add('case_early');
-    chat_collumn.style.display = 'none';
-    interested_wrapper.style.display = 'flex';
+    eventStatus.updateStatus(eventData, 'early');
     const countdown = new Countdown(countdownElement, eventStartDate, {
       threshold: '0',
       reset: 'false',
       onEnd: () => {
         countdown_wrapper.style.display = 'none';
         videoElement.style.display = 'flex';
-        // Initialize player when countdown ends
         initializePlayer(videoElement, eventData);
-        event_status_wrapper.classList.remove('case_ended', 'case_early');
-        event_status_wrapper.classList.add('case_live');
-        chat_collumn.style.display = 'flex';
+        eventStatus.updateStatus(eventData, 'live');
         // Set up end time check
         const endCheckInterval = setInterval(() => {
           if (new Date() > eventEndDate) {
             clearInterval(endCheckInterval);
             videoElement.style.display = 'none';
             event_finished_wrapper.style.display = 'block';
+            eventStatus.updateStatus(eventData, 'ended');
           }
         }, 1000);
       },
     });
 
     countdown.start();
-    console.log('Countdown started');
   }
 };

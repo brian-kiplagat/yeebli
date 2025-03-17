@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.1.22
+
+### Patch Changes
+
+- beeaef4: fix: count
+- d00f96d: fix: video
+
 ## 1.1.21
 
 ### Patch Changes

@@ -80,13 +80,18 @@ export class Video {
         '[wized="event_ending_expiry"]'
       );
       this.player.on('timeupdate', () => {
-        if (!this.player) return;
+        if (!this.player || !event_ending_in || !event_ending_expiry) return;
         const currentTime = this.player.currentTime || 0;
         const duration = this.player.duration || 0;
         const timeLeft = Math.round(duration - currentTime);
-        if (event_ending_in && event_ending_expiry && timeLeft <= 10 && timeLeft > 0) {
+        if (timeLeft <= 10 && timeLeft > 0) {
           event_ending_expiry.style.display = 'flex';
           event_ending_in.textContent = `Event ends in ${timeLeft}`;
+        }
+        //if time left is 0 or less, show event ended
+        if (timeLeft <= 0) {
+          event_ending_expiry.style.display = 'flex';
+          event_ending_in.textContent = 'Event ended';
         }
       });
 

@@ -114,11 +114,9 @@ const setupMetadata = (eventData: EventData) => {
 
 const initializePlayer = (video: HTMLElement, eventData: EventData) => {
   console.log({ video, eventData });
-
-  // Use the presigned URL from the asset
   const videoUrl = eventData.asset.presignedUrl;
-
-  const player = new Video(videoUrl, video);
+  const eventStatus = new EventStatus();
+  const player = new Video(videoUrl, video, eventStatus, eventData);
   console.log('Player instance:', player);
   return { player, videoElement: video };
 };
@@ -156,6 +154,18 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
   videoElement.style.display = 'none';
   event_finished_wrapper.style.display = 'none';
 
+  // Set up end time check function
+  const setupEndTimeCheck = () => {
+    const endCheckInterval = setInterval(() => {
+      if (new Date() > eventEndDate) {
+        clearInterval(endCheckInterval);
+        videoElement.style.display = 'none';
+        event_finished_wrapper.style.display = 'block';
+        eventStatus.updateStatus(eventData, 'ended');
+      }
+    }, 1000);
+  };
+
   // If event has ended
   if (now > eventEndDate) {
     event_finished_wrapper.style.display = 'block';
@@ -166,6 +176,7 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     videoElement.style.display = 'flex';
     eventStatus.updateStatus(eventData, 'live');
     initializePlayer(videoElement, eventData);
+    setupEndTimeCheck();
   }
   // If event hasn't started
   else {
@@ -179,15 +190,7 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
         videoElement.style.display = 'flex';
         initializePlayer(videoElement, eventData);
         eventStatus.updateStatus(eventData, 'live');
-        // Set up end time check
-        const endCheckInterval = setInterval(() => {
-          if (new Date() > eventEndDate) {
-            clearInterval(endCheckInterval);
-            videoElement.style.display = 'none';
-            event_finished_wrapper.style.display = 'block';
-            eventStatus.updateStatus(eventData, 'ended');
-          }
-        }, 1000);
+        setupEndTimeCheck();
       },
     });
 

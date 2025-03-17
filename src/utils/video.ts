@@ -3,6 +3,9 @@ import 'plyr/dist/plyr.css';
 import Hls from 'hls.js';
 import Plyr from 'plyr';
 
+import type { EventData } from './eventStatus';
+import { EventStatus } from './eventStatus';
+
 export class Video {
   private player: Plyr | null = null;
   private hls: Hls | null = null;
@@ -12,7 +15,9 @@ export class Video {
 
   constructor(
     public media_url: string,
-    public context: HTMLElement
+    public context: HTMLElement,
+    private eventStatus: EventStatus,
+    private eventData: EventData
   ) {
     // Extract event code from URL if it exists
     const urlParams = new URLSearchParams(window.location.search);

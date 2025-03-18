@@ -2,6 +2,8 @@ import { initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   Firestore,
   onSnapshot,
   orderBy,
@@ -147,6 +149,8 @@ export class Chat {
     }
     if (deleteButton) {
       deleteButton.style.display = message.senderId === 'current_user_id' ? 'block' : 'none';
+      // Add click handler for delete
+      deleteButton.addEventListener('click', () => this.deleteMessage(message.id));
     }
 
     return clone;
@@ -200,6 +204,27 @@ export class Chat {
     });
 
     return docRef.id;
+  }
+
+  /**
+   * Delete a message from the chat
+   * @param messageId - The ID of the message to delete
+   */
+  private async deleteMessage(messageId: string): Promise<void> {
+    try {
+      const messageRef = doc(
+        this.db,
+        'events',
+        this.eventData.id.toString(),
+        'messages',
+        messageId
+      );
+      await deleteDoc(messageRef);
+      // The message will be automatically removed from the UI
+      // through the Firestore snapshot listener
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
   }
 
   /**

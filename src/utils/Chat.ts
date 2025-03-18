@@ -20,6 +20,7 @@ export class Chat {
   private unsubscribe: (() => void) | null = null;
   private chatForm: HTMLElement | null = null;
   private message_wrapper: HTMLElement | null = null;
+  private chat_body: HTMLElement | null = null;
 
   constructor(eventData: EventData) {
     // Initialize Firebase if not already initialized
@@ -27,7 +28,6 @@ export class Chat {
     this.db = getFirestore(app);
     this.eventData = eventData;
     this.findAndInitialiseElements();
-    this.initializeFormSubmission();
   }
 
   /**
@@ -44,10 +44,12 @@ export class Chat {
   private findAndInitialiseElements() {
     this.chatForm = document.querySelector<HTMLElement>('[wized="chat_form"]');
     this.message_wrapper = document.querySelector<HTMLElement>('[wized="message_wrapper"]');
+    this.chat_body = document.querySelector<HTMLElement>('[wized="chat_body"]');
 
-    if (!this.chatForm || !this.message_wrapper) {
+    if (!this.chatForm || !this.message_wrapper || !this.chat_body) {
       throw new Error('Chat elements not found');
     }
+    this.initializeFormSubmission();
   }
   /**
    * Subscribe to chat messages for the event
@@ -79,7 +81,7 @@ export class Chat {
    * @param messages - Array of chat messages
    */
   private updateMessageList(messages: ChatMessage[]): void {
-    if (!this.message_wrapper) return;
+    if (!this.message_wrapper || !this.chat_body) return;
 
     // Clear existing message clones
     const existingClones = this.message_wrapper.querySelectorAll('[CLONE="true"]');
@@ -114,13 +116,13 @@ export class Chat {
     }
 
     // Single DOM operation to append all clones
-    this.message_wrapper.appendChild(fragment);
+    this.chat_body.appendChild(fragment);
 
     // Remove the original template
     this.message_wrapper.remove();
 
     // Scroll to bottom of messages
-    this.message_wrapper.scrollTop = this.message_wrapper.scrollHeight;
+    this.chat_body.scrollTop = this.chat_body.scrollHeight;
   }
 
   /**

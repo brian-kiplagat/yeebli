@@ -15,6 +15,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from '../config/firebase-config';
 import type { ChatMessage } from '../types/chat';
 import type { EventData } from '../utils/eventStatus';
+import type { User } from './types';
 
 export class Chat {
   private db: Firestore;
@@ -188,7 +189,10 @@ export class Chat {
       if (!messageInput || !messageInput.value.trim()) return;
 
       try {
-        await this.sendMessage('current_user_id', messageInput.value.trim());
+        const userString = localStorage.getItem('user');
+        if (!userString) throw new Error('User not found');
+        const userObject = JSON.parse(userString) as User;
+        await this.sendMessage(userObject.id.toString(), messageInput.value.trim());
         messageInput.value = ''; // Clear input after successful send
       } catch (error) {
         console.error('Error sending message:', error);

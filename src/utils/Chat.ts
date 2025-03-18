@@ -1,3 +1,4 @@
+import { initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
@@ -7,42 +8,40 @@ import {
   query,
   serverTimestamp,
 } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
-import type { ChatMessage, EventChat } from '../types/chat';
+import { firebaseConfig } from '../config/firebase-config';
+import type { ChatMessage } from '../types/chat';
+import type { EventData } from '../utils/eventStatus';
 
 export class Chat {
   private db: Firestore;
-  private eventsCollection: string = 'events';
-  private messagesSubcollection: string = 'messages';
+  private eventData: EventData;
   private unsubscribe: (() => void) | null = null;
 
-  constructor(db: Firestore) {
-    this.db = db;
+  constructor(eventData: EventData) {
+    // Initialize Firebase if not already initialized
+    const app = initializeApp(firebaseConfig);
+    this.db = getFirestore(app);
+    this.eventData = eventData;
   }
 
   /**
-   * Initialize chat for an event
-   * @param eventId - The ID of the event
+   * Initialize chat for the event
    * @param onMessageUpdate - Callback for when messages are updated
    */
-  init(eventId: string, onMessageUpdate: (messages: ChatMessage[]) => void) {
+  init(onMessageUpdate: (messages: ChatMessage[]) => void) {
     // Subscribe to messages
-    this.unsubscribe = this.subscribeToMessages(eventId, onMessageUpdate);
+    this.unsubscribe = this.subscribeToMessages(onMessageUpdate);
   }
 
   /**
-   * Subscribe to chat messages for a specific event
-   * @param eventId - The ID of the event
+   * Subscribe to chat messages for the event
    * @param callback - Function to be called when messages are updated
    * @returns Unsubscribe function
    */
-  private subscribeToMessages(eventId: string, callback: (messages: ChatMessage[]) => void) {
-    const messagesRef = collection(
-      this.db,
-      this.eventsCollection,
-      eventId,
-      this.messagesSubcollection
-    );
+  private subscribeToMessages(callback: (messages: ChatMessage[]) => void) {
+    const messagesRef = collection(this.db, 'events', this.eventData.event_code, 'messages');
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
 
     return onSnapshot(q, (snapshot) => {
@@ -62,18 +61,12 @@ export class Chat {
 
   /**
    * Send a new message to the event chat
-   * @param eventId - The ID of the event
    * @param senderId - The ID of the message sender
    * @param text - The message text
    * @returns The ID of the new message
    */
-  async sendMessage(eventId: string, senderId: string, text: string): Promise<string> {
-    const messagesRef = collection(
-      this.db,
-      this.eventsCollection,
-      eventId,
-      this.messagesSubcollection
-    );
+  async sendMessage(senderId: string, text: string): Promise<string> {
+    const messagesRef = collection(this.db, 'events', this.eventData.event_code, 'messages');
 
     const docRef = await addDoc(messagesRef, {
       senderId,
@@ -81,20 +74,6 @@ export class Chat {
       timestamp: serverTimestamp(),
     });
 
-    return docRef.id;
-  }
-
-  /**
-   * Create a new event chat
-   * @param event - The event details
-   * @returns The ID of the new event
-   */
-  async createEvent(event: Omit<EventChat, 'id' | 'messages'>): Promise<string> {
-    const eventsRef = collection(this.db, this.eventsCollection);
-    const docRef = await addDoc(eventsRef, {
-      ...event,
-      messages: [],
-    });
     return docRef.id;
   }
 

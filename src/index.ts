@@ -1,3 +1,4 @@
+import { Chat } from '$utils/Chat';
 import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
 import { greetUser } from '$utils/greet';
@@ -177,6 +178,13 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     eventStatus.updateStatus(eventData, 'live');
     initializePlayer(videoElement, eventData);
     setupEndTimeCheck();
+
+    // Initialize chat for the event
+    const chat = new Chat(eventData);
+    chat.init((messages) => {
+      // Handle new messages here
+      console.log('New messages:', messages);
+    });
   }
   // If event hasn't started
   else {
@@ -191,6 +199,13 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
         initializePlayer(videoElement, eventData);
         eventStatus.updateStatus(eventData, 'live');
         setupEndTimeCheck();
+
+        // Initialize chat when event starts
+        const chat = new Chat(eventData);
+        chat.init((messages) => {
+          // Handle new messages here
+          console.log('New messages:', messages);
+        });
       },
     });
 

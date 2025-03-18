@@ -1,8 +1,9 @@
 export const firebaseConfig = {
-  apiKey: 'your_api_key',
-  authDomain: 'your_auth_domain',
-  projectId: 'your_project_id',
-  storageBucket: 'your_storage_bucket',
-  messagingSenderId: 'your_messaging_sender_id',
-  appId: 'your_app_id',
+  apiKey: 'AIzaSyASAwvTsyLtY-TzuTCAXgdFRyM4LAJxzF0',
+  authDomain: 'yeebli-46fgj.firebaseapp.com',
+  projectId: 'yeebli-46fgj',
+  storageBucket: 'yeebli-46fgj.firebasestorage.app',
+  messagingSenderId: '183885355275',
+  appId: '1:183885355275:web:c568e84ff7dc144e8d6a0e',
+  measurementId: 'G-L2XLJZML32',
 };

@@ -151,7 +151,9 @@ export class Chat {
     const timestamp = clone.querySelector<HTMLElement>('[wized="timestamp"]');
     const messageText = clone.querySelector<HTMLElement>('[wized="message_text"]');
     const deleteButton = clone.querySelector<HTMLElement>('[wized="delete_message"]');
-
+    const message_inner_wrapper = clone.querySelector<HTMLElement>(
+      '[wized="message_inner_wrapper"]'
+    );
     // Update elements with message data
     if (timestamp) {
       timestamp.textContent = new Date(message.timestamp).toLocaleString();
@@ -160,9 +162,17 @@ export class Chat {
       messageText.textContent = message.text;
     }
     if (deleteButton) {
-      deleteButton.style.display = message.senderId === 'current_user_id' ? 'block' : 'none';
+      // Only show delete button if the sender is the host
+      deleteButton.style.display =
+        message.senderId === String(this.eventData.host_id) ? 'block' : 'none';
       // Add click handler for delete
       deleteButton.addEventListener('click', () => this.deleteMessage(message.id));
+    }
+    // Add class that aligns the message to the right if the sender is not the host
+    if (message.senderId !== String(this.eventData.host_id)) {
+      clone.classList.add('right');
+      message_inner_wrapper?.classList.add('right');
+      messageText?.classList.add('right');
     }
 
     return clone;

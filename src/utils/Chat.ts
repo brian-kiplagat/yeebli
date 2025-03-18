@@ -87,8 +87,11 @@ export class Chat {
             timestamp: data.timestamp?.toDate() || new Date(),
           };
           this.addNewMessage(message);
+        } else if (change.type === 'removed') {
+          // Remove the message from UI
+          const messageElement = this.chat_body?.querySelector(`[data-id="${change.doc.id}"]`);
+          messageElement?.remove();
         }
-        // You can also handle 'modified' and 'removed' cases here if needed
       });
     });
   }
@@ -212,6 +215,7 @@ export class Chat {
    */
   private async deleteMessage(messageId: string): Promise<void> {
     try {
+      console.log('Deleting message:', messageId);
       const messageRef = doc(
         this.db,
         'events',

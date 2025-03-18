@@ -61,68 +61,101 @@ export class Chat {
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
 
     return onSnapshot(q, (snapshot) => {
-      const messages: ChatMessage[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        messages.push({
+      // Handle initial load
+      if (snapshot.docChanges().length === snapshot.docs.length) {
+        const messages: ChatMessage[] = snapshot.docs.map((doc) => ({
           id: doc.id,
-          senderId: data.senderId,
-          text: data.text,
-          timestamp: data.timestamp?.toDate() || new Date(),
-        });
+          senderId: doc.data().senderId,
+          text: doc.data().text,
+          timestamp: doc.data().timestamp?.toDate() || new Date(),
+        }));
+        this.initializeMessageList(messages);
+        callback(messages);
+        return;
+      }
+
+      // Handle real-time updates
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const data = change.doc.data();
+          const message: ChatMessage = {
+            id: change.doc.id,
+            senderId: data.senderId,
+            text: data.text,
+            timestamp: data.timestamp?.toDate() || new Date(),
+          };
+          this.addNewMessage(message);
+        }
+        // You can also handle 'modified' and 'removed' cases here if needed
       });
-      this.updateMessageList(messages);
-      callback(messages);
     });
   }
 
-  /**
-   * Update the message list UI with new messages
-   * @param messages - Array of chat messages
-   */
-  private updateMessageList(messages: ChatMessage[]): void {
+  private initializeMessageList(messages: ChatMessage[]): void {
     if (!this.message_wrapper || !this.chat_body) return;
 
-    // Clear existing message clones
-    const existingClones = this.message_wrapper.querySelectorAll('[CLONE="true"]');
-    existingClones.forEach((clone) => clone.remove());
+    // Clear chat body
+    while (this.chat_body.firstChild) {
+      this.chat_body.removeChild(this.chat_body.firstChild);
+    }
 
-    // Create document fragment for batch DOM operations
+    // Create all messages at once
     const fragment = document.createDocumentFragment();
 
     for (const message of messages) {
-      const clone = this.message_wrapper.cloneNode(true) as HTMLElement;
-      clone.setAttribute('CLONE', 'true');
-      clone.setAttribute('data-id', message.id);
-
-      // Find elements within the clone
-      const timestamp = clone.querySelector<HTMLElement>('[wized="timestamp"]');
-      const messageText = clone.querySelector<HTMLElement>('[wized="message_text"]');
-      const deleteButton = clone.querySelector<HTMLElement>('[wized="delete_message"]');
-
-      // Update elements with message data
-      if (timestamp) {
-        timestamp.textContent = new Date(message.timestamp).toLocaleString();
-      }
-      if (messageText) {
-        messageText.textContent = message.text;
-      }
-      if (deleteButton) {
-        // Only show delete button for user's own messages
-        deleteButton.style.display = message.senderId === 'current_user_id' ? 'block' : 'none';
-      }
-
+      const clone = this.createMessageElement(message);
       fragment.appendChild(clone);
     }
 
-    // Single DOM operation to append all clones
     this.chat_body.appendChild(fragment);
 
     // Remove the original template
-    this.message_wrapper.remove();
+    if (this.message_wrapper.parentNode) {
+      this.message_wrapper.remove();
+    }
 
-    // Scroll to bottom of messages
-    this.chat_body.scrollTop = this.chat_body.scrollHeight;
+    this.scrollToBottom();
+  }
+
+  private addNewMessage(message: ChatMessage): void {
+    if (!this.message_wrapper || !this.chat_body) return;
+
+    const messageElement = this.createMessageElement(message);
+    this.chat_body.appendChild(messageElement);
+    this.scrollToBottom();
+  }
+
+  private createMessageElement(message: ChatMessage): HTMLElement {
+    if (!this.message_wrapper) {
+      throw new Error('Message wrapper not found');
+    }
+    const clone = this.message_wrapper.cloneNode(true) as HTMLElement;
+    clone.setAttribute('CLONE', 'true');
+    clone.setAttribute('data-id', message.id);
+
+    // Find elements within the clone
+    const timestamp = clone.querySelector<HTMLElement>('[wized="timestamp"]');
+    const messageText = clone.querySelector<HTMLElement>('[wized="message_text"]');
+    const deleteButton = clone.querySelector<HTMLElement>('[wized="delete_message"]');
+
+    // Update elements with message data
+    if (timestamp) {
+      timestamp.textContent = new Date(message.timestamp).toLocaleString();
+    }
+    if (messageText) {
+      messageText.textContent = message.text;
+    }
+    if (deleteButton) {
+      deleteButton.style.display = message.senderId === 'current_user_id' ? 'block' : 'none';
+    }
+
+    return clone;
+  }
+
+  private scrollToBottom(): void {
+    if (this.chat_body) {
+      this.chat_body.scrollTop = this.chat_body.scrollHeight;
+    }
   }
 
   /**
@@ -131,7 +164,7 @@ export class Chat {
   private initializeFormSubmission(): void {
     if (!this.chatForm) return;
 
-    this.chatForm.addEventListener('submit', async (e) => {
+    this.chatForm.addEventListener('submit', async (e: Event) => {
       e.preventDefault();
 
       const form = e.target as HTMLFormElement;
@@ -155,6 +188,9 @@ export class Chat {
    * @returns The ID of the new message
    */
   async sendMessage(senderId: string, text: string): Promise<string> {
+    if (!this.db) {
+      throw new Error('Database not initialized');
+    }
     const messagesRef = collection(this.db, 'events', this.eventData.id.toString(), 'messages');
 
     const docRef = await addDoc(messagesRef, {

@@ -204,6 +204,7 @@ export class Chat {
         const userString = localStorage.getItem('user');
         if (!userString) throw new Error('User not found');
         const userObject = JSON.parse(userString) as User;
+
         await this.sendMessage(userObject.id.toString(), messageInput.value.trim());
         messageInput.value = ''; // Clear input after successful send
       } catch (error) {

@@ -10,9 +10,15 @@ export interface EventData {
   updated_at: string;
   host_id: number;
   asset: Asset;
+  host: Host;
   event_code: string;
 }
-
+export interface Host {
+  id: number;
+  name: string;
+  email: string;
+  profile_image: string;
+}
 export interface Asset {
   id: number;
   asset_name: string;

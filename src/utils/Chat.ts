@@ -154,6 +154,18 @@ export class Chat {
     const message_inner_wrapper = clone.querySelector<HTMLElement>(
       '[wized="message_inner_wrapper"]'
     );
+    if (!message_inner_wrapper) {
+      throw new Error('Message inner wrapper not found');
+    }
+    if (!messageText) {
+      throw new Error('Message text not found');
+    }
+    if (!timestamp) {
+      throw new Error('Timestamp not found');
+    }
+    if (!deleteButton) {
+      throw new Error('Delete button not found');
+    }
     // Update elements with message data
     if (timestamp) {
       timestamp.textContent = new Date(message.timestamp).toLocaleString();

@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.1.25
+
+### Patch Changes
+
+- 978084b: fix: chat
+- 583e680: fix: image
+
 ## 1.1.24
 
 ### Patch Changes

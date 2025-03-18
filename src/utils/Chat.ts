@@ -32,6 +32,7 @@ export class Chat {
     this.db = getFirestore(app);
     this.eventData = eventData;
     this.findAndInitialiseElements();
+    this.initializeFormSubmission();
   }
 
   /**
@@ -60,7 +61,6 @@ export class Chat {
     ) {
       throw new Error('Chat elements not found');
     }
-    this.initializeFormSubmission();
   }
   /**
    * Subscribe to chat messages for the event
@@ -188,7 +188,9 @@ export class Chat {
    * Initialize form submission handling
    */
   private initializeFormSubmission(): void {
-    if (!this.chatForm) return;
+    if (!this.chatForm) {
+      throw new Error('Chat form not found');
+    }
 
     this.chatForm.addEventListener('submit', async (e: Event) => {
       e.preventDefault();

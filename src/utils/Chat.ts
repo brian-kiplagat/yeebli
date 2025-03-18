@@ -41,7 +41,7 @@ export class Chat {
    * @returns Unsubscribe function
    */
   private subscribeToMessages(callback: (messages: ChatMessage[]) => void) {
-    const messagesRef = collection(this.db, 'events', this.eventData.event_code, 'messages');
+    const messagesRef = collection(this.db, 'events', this.eventData.id.toString(), 'messages');
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
 
     return onSnapshot(q, (snapshot) => {
@@ -66,7 +66,7 @@ export class Chat {
    * @returns The ID of the new message
    */
   async sendMessage(senderId: string, text: string): Promise<string> {
-    const messagesRef = collection(this.db, 'events', this.eventData.event_code, 'messages');
+    const messagesRef = collection(this.db, 'events', this.eventData.id.toString(), 'messages');
 
     const docRef = await addDoc(messagesRef, {
       senderId,

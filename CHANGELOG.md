@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.26
+
+### Patch Changes
+
+- 3d7e2c6: fix: inner wrapper
+
 ## 1.1.25
 
 ### Patch Changes

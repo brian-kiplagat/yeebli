@@ -15,6 +15,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from '../config/firebase-config';
 import type { ChatMessage } from '../types/chat';
 import type { EventData } from '../utils/eventStatus';
+import { formatChatDate } from './reusables';
 import type { User } from './types';
 
 export class Chat {
@@ -61,6 +62,7 @@ export class Chat {
     ) {
       throw new Error('Chat elements not found');
     }
+    this.message_chat_host_name.textContent = this.eventData.host.name;
   }
   /**
    * Subscribe to chat messages for the event
@@ -168,7 +170,7 @@ export class Chat {
     }
     // Update elements with message data
     if (timestamp) {
-      timestamp.textContent = new Date(message.timestamp).toLocaleString();
+      timestamp.textContent = formatChatDate(message.timestamp);
     }
     if (messageText) {
       messageText.textContent = message.text;

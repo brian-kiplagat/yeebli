@@ -1,3 +1,5 @@
+import { formatDate } from './reusables';
+
 export interface EventData {
   id: number;
   event_name: string;
@@ -55,14 +57,16 @@ export class EventStatus {
     if (!this.event_status_text || !this.event_status_wrapper) return;
 
     switch (status) {
-      case 'ended':
-        this.event_status_text.textContent = `Event Ended ${eventData.event_date} ${eventData.end_time}`;
+      case 'ended': {
+        const endDate = new Date(eventData.event_date + ' ' + eventData.end_time);
+        this.event_status_text.textContent = `Event Ended ${formatDate(endDate, 'DD MMM YYYY HH:mm')}`;
         this.event_status_wrapper.classList.remove('case_live', 'case_early');
         this.event_status_wrapper.classList.add('case_ended');
         if (this.chat_collumn) this.chat_collumn.style.display = 'none';
         if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
         if (this.event_ending_expiry) this.event_ending_expiry.style.display = 'none';
         break;
+      }
       case 'live':
         this.event_status_text.textContent = countdown
           ? `Event ending in ${countdown}`
@@ -72,14 +76,16 @@ export class EventStatus {
         if (this.chat_collumn) this.chat_collumn.style.display = 'flex';
         if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
         break;
-      case 'early':
-        this.event_status_text.textContent = `Event starts ${eventData.event_date} ${eventData.start_time}`;
+      case 'early': {
+        const startDate = new Date(eventData.event_date + ' ' + eventData.start_time);
+        this.event_status_text.textContent = `Event starts ${formatDate(startDate, 'DD MMM YYYY HH:mm')}`;
         this.event_status_wrapper.classList.remove('case_ended', 'case_live');
         this.event_status_wrapper.classList.add('case_early');
         if (this.chat_collumn) this.chat_collumn.style.display = 'none';
         if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
         if (this.event_ending_expiry) this.event_ending_expiry.style.display = 'none';
         break;
+      }
     }
   }
 }

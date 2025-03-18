@@ -23,6 +23,7 @@ export class Chat {
   private chatForm: HTMLElement | null = null;
   private message_wrapper: HTMLElement | null = null;
   private chat_body: HTMLElement | null = null;
+  private message_chat_host_name: HTMLElement | null = null;
 
   constructor(eventData: EventData) {
     // Initialize Firebase if not already initialized
@@ -47,8 +48,15 @@ export class Chat {
     this.chatForm = document.querySelector<HTMLElement>('[wized="chat_form"]');
     this.message_wrapper = document.querySelector<HTMLElement>('[wized="message_wrapper"]');
     this.chat_body = document.querySelector<HTMLElement>('[wized="chat_body"]');
-
-    if (!this.chatForm || !this.message_wrapper || !this.chat_body) {
+    this.message_chat_host_name = document.querySelector<HTMLElement>(
+      '[wized="message_chat_host_name"]'
+    );
+    if (
+      !this.chatForm ||
+      !this.message_wrapper ||
+      !this.chat_body ||
+      !this.message_chat_host_name
+    ) {
       throw new Error('Chat elements not found');
     }
     this.initializeFormSubmission();
@@ -215,7 +223,7 @@ export class Chat {
    */
   private async deleteMessage(messageId: string): Promise<void> {
     try {
-      console.log('Deleting message:', messageId);
+      console.log('Deleting:', messageId);
       const messageRef = doc(
         this.db,
         'events',

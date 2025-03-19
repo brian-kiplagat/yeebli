@@ -1,5 +1,13 @@
 # @finsweet/developer-starter
 
+## 1.1.28
+
+### Patch Changes
+
+- a13255d: fix: timing
+- 7aa806b: fix: ending
+- 619df48: fix: left
+
 ## 1.1.27
 
 ### Patch Changes

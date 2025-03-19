@@ -128,6 +128,8 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
   const event_finished_wrapper = document.querySelector<HTMLElement>(
     '[wized="event_finished_wrapper"]'
   );
+  const event_ending_in = document.querySelector<HTMLElement>('[wized="event_ending_in"]');
+  const event_ending_expiry = document.querySelector<HTMLElement>('[wized="event_ending_expiry"]');
 
   // Check each element individually and log specific errors
   if (!countdownElement) {
@@ -142,7 +144,14 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     console.error('Missing element: [wized="event_finished_wrapper"]');
     return;
   }
-
+  if (!event_ending_in) {
+    console.error('Missing element: [wized="event_ending_in"]');
+    return;
+  }
+  if (!event_ending_expiry) {
+    console.error('Missing element: [wized="event_ending_expiry"]');
+    return;
+  }
   const eventStartDate = new Date(eventData.event_date + ' ' + eventData.start_time);
   const eventEndDate = new Date(eventData.event_date + ' ' + eventData.end_time);
   const now = new Date();
@@ -154,11 +163,21 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
   countdown_wrapper.style.display = 'none';
   videoElement.style.display = 'none';
   event_finished_wrapper.style.display = 'none';
+  event_ending_in.style.display = 'none';
+  event_ending_expiry.style.display = 'none';
 
   // Set up end time check function
   const setupEndTimeCheck = () => {
     const endCheckInterval = setInterval(() => {
-      if (new Date() > eventEndDate) {
+      const now = new Date();
+      const timeLeft = Math.round((eventEndDate.getTime() - now.getTime()) / 1000);
+
+      if (timeLeft <= 20 && timeLeft > 0) {
+        event_ending_in.style.display = 'flex';
+        eventStatus.updateStatus(eventData, 'live', timeLeft);
+        console.log('Event ending in:', timeLeft);
+      }
+      if (now > eventEndDate) {
         clearInterval(endCheckInterval);
         videoElement.style.display = 'none';
         event_finished_wrapper.style.display = 'block';
@@ -178,13 +197,7 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     eventStatus.updateStatus(eventData, 'live');
     initializePlayer(videoElement, eventData);
     setupEndTimeCheck();
-
-    // Initialize chat for the event
-    const chat = new Chat(eventData);
-    chat.init((messages) => {
-      // Handle new messages here
-      console.log('New messages:', messages);
-    });
+    initializeChat(eventData);
   }
   // If event hasn't started
   else {
@@ -199,16 +212,18 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
         initializePlayer(videoElement, eventData);
         eventStatus.updateStatus(eventData, 'live');
         setupEndTimeCheck();
-
-        // Initialize chat when event starts
-        const chat = new Chat(eventData);
-        chat.init((messages) => {
-          // Handle new messages here
-          console.log('New messages:', messages);
-        });
+        initializeChat(eventData);
       },
     });
 
     countdown.start();
   }
+};
+
+const initializeChat = (eventData: EventData) => {
+  const chat = new Chat(eventData);
+  chat.init((messages) => {
+    // Handle new messages here
+    console.log('New messages:', messages);
+  });
 };

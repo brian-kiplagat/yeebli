@@ -103,21 +103,6 @@ export class Video {
         console.log('Video ended');
       });
 
-      const event_ending_in = document.querySelector<HTMLElement>('[wized="event_ending_in"]');
-      const event_ending_expiry = document.querySelector<HTMLElement>(
-        '[wized="event_ending_expiry"]'
-      );
-      this.player.on('timeupdate', () => {
-        if (!this.player || !event_ending_in || !event_ending_expiry) return;
-        const currentTime = this.player.currentTime || 0;
-        const duration = this.player.duration || 0;
-        const timeLeft = Math.round(duration - currentTime);
-        if (timeLeft <= 10 && timeLeft > 0) {
-          event_ending_expiry.style.display = 'flex';
-          event_ending_in.textContent = `Event ends in ${timeLeft}`;
-        }
-      });
-
       // Save progress before unload
       window.addEventListener('beforeunload', () => {
         localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());

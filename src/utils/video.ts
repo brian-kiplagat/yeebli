@@ -58,6 +58,18 @@ export class Video {
       this.player = new Plyr(videoElement, { autoplay: true, muted: true, controls });
       this.player.muted = true;
 
+      // Check autoplay policy
+      if (navigator.getAutoplayPolicy) {
+        const autoplayPolicy = navigator.getAutoplayPolicy('mediaelement');
+        console.log('Autoplay policy:', autoplayPolicy);
+
+        if (autoplayPolicy === 'disallowed') {
+          console.log('Autoplay is not allowed');
+          // Handle disallowed case - maybe show a play button
+          return;
+        }
+      }
+
       // Restore last playback position
       const savedProgress = localStorage.getItem(this.STORAGE_KEY);
       if (savedProgress) {
@@ -76,6 +88,17 @@ export class Video {
       this.player.on('pause', () => {
         localStorage.setItem(this.STORAGE_KEY, videoElement.currentTime.toString());
       });
+
+      // Handle autoplay errors
+      this.player.on('error', () => {
+        const { error } = videoElement;
+        console.error('Playback error:', error);
+        if (error?.code === 4) {
+          // MEDIA_ERR_ABORTED
+          console.log('Autoplay was blocked');
+        }
+      });
+
       this.player.on('ended', () => {
         console.log('Video ended');
       });

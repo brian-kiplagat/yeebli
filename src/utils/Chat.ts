@@ -15,8 +15,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from '../config/firebase-config';
 import type { ChatMessage } from '../types/chat';
 import type { EventData } from '../utils/eventStatus';
-import { formatChatDate } from './reusables';
-import type { User } from './types';
+import { formatChatDate, getUserFromStorage } from './reusables';
 
 export class Chat {
   private db: Firestore;
@@ -176,14 +175,15 @@ export class Chat {
       messageText.textContent = message.text;
     }
     if (deleteButton) {
-      // Only show delete button if the sender is the host
-      deleteButton.style.display =
-        message.senderId === String(this.eventData.host_id) ? 'block' : 'none';
+      // Only show delete button if the looged in user is the host
+      const user = getUserFromStorage();
+      deleteButton.style.display = user?.id === this.eventData.host_id ? 'block' : 'none';
       // Add click handler for delete
       deleteButton.addEventListener('click', () => this.deleteMessage(message.id));
     }
-    // Add class that aligns the message to the right if the sender is not the host
-    if (message.senderId !== String(this.eventData.host_id)) {
+    // Add class that aligns the message to the right for current user, and to the left for other users
+    const user = getUserFromStorage();
+    if (message.senderId === user?.id.toString()) {
       clone.classList.add('right');
       message_inner_wrapper?.classList.add('right');
       messageText?.classList.add('right');
@@ -215,11 +215,11 @@ export class Chat {
       if (!messageInput || !messageInput.value.trim()) return;
 
       try {
-        const userString = localStorage.getItem('user');
-        if (!userString) throw new Error('User not found');
-        const userObject = JSON.parse(userString) as User;
-
-        await this.sendMessage(userObject.id.toString(), messageInput.value.trim());
+        const user = getUserFromStorage();
+        if (!user) {
+          return;
+        }
+        await this.sendMessage(user.id.toString(), messageInput.value.trim());
         messageInput.value = ''; // Clear input after successful send
       } catch (error) {
         console.error('Error sending message:', error);

@@ -1,3 +1,14 @@
+import type { User } from './types';
+
+export const getUserFromStorage = (): User | null => {
+  const userString = localStorage.getItem('user');
+  if (!userString) {
+    console.error('User not found');
+    return null;
+  }
+  return JSON.parse(userString) as User;
+};
+
 type DateFormat =
   | 'YYYY DD MM HH:mm' // 2025 18 03 14:30
   | 'YYYY-DD-MM HH:mm' // 2025-18-03 14:30

@@ -28,6 +28,12 @@ export const formatDate = (
   format: DateFormat = 'YYYY DD MM HH:mm'
 ): string => {
   const d = new Date(date);
+
+  // Convert UTC to local time if the date is in UTC (has 'Z' suffix)
+  if (typeof date === 'string' && date.endsWith('Z')) {
+    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+  }
+
   const day = String(d.getDate()).padStart(2, '0');
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const year = d.getFullYear();

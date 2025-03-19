@@ -58,7 +58,7 @@ export class EventStatus {
 
     switch (status) {
       case 'ended': {
-        const endDate = new Date(eventData.event_date + ' ' + eventData.end_time);
+        const endDate = new Date(eventData.event_date + 'T' + eventData.end_time + 'Z');
         this.event_status_text.textContent = `Event Ended ${formatDate(endDate, 'DD MMM YYYY HH:mm')}`;
         this.event_status_wrapper.classList.remove('case_live', 'case_early');
         this.event_status_wrapper.classList.add('case_ended');
@@ -77,7 +77,7 @@ export class EventStatus {
         if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
         break;
       case 'early': {
-        const startDate = new Date(eventData.event_date + ' ' + eventData.start_time);
+        const startDate = new Date(eventData.event_date + 'T' + eventData.start_time + 'Z');
         this.event_status_text.textContent = `Event starts ${formatDate(startDate, 'DD MMM YYYY HH:mm')}`;
         this.event_status_wrapper.classList.remove('case_ended', 'case_live');
         this.event_status_wrapper.classList.add('case_early');

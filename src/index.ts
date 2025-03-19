@@ -2,6 +2,7 @@ import { Chat } from '$utils/Chat';
 import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
 import { greetUser } from '$utils/greet';
+import { formatDate } from '$utils/reusables';
 import { RouteGuard } from '$utils/routeGuards';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
@@ -143,9 +144,14 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     return;
   }
 
-  const eventStartDate = new Date(eventData.event_date + ' ' + eventData.start_time);
-  const eventEndDate = new Date(eventData.event_date + ' ' + eventData.end_time);
+  const eventStartDate = new Date(eventData.event_date + 'T' + eventData.start_time + 'Z');
+  const eventEndDate = new Date(eventData.event_date + 'T' + eventData.end_time + 'Z');
   const now = new Date();
+
+  // Format dates for display in local timezone
+  const formattedStartDate = formatDate(eventStartDate, 'DD MMM YYYY HH:mm');
+  const formattedEndDate = formatDate(eventEndDate, 'DD MMM YYYY HH:mm');
+  console.log({ formattedStartDate, formattedEndDate });
 
   // Initialize event status handler
   const eventStatus = new EventStatus();

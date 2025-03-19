@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.27
+
+### Patch Changes
+
+- 1481650: fix: chats times
+
 ## 1.1.26
 
 ### Patch Changes

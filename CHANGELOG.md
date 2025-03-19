@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.29
+
+### Patch Changes
+
+- 1fb2c59: fix: time
+
 ## 1.1.28
 
 ### Patch Changes

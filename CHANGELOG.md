@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.1.30
+
+### Patch Changes
+
+- 2016441: fix: summary
+- a3c4b29: fix: types
+
 ## 1.1.29
 
 ### Patch Changes

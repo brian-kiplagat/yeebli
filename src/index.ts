@@ -7,7 +7,7 @@ import { RouteGuard } from '$utils/routeGuards';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
 
-import type { EventData } from './utils/eventStatus';
+import type { EventData } from './types/event';
 import { EventStatus } from './utils/eventStatus';
 
 /**
@@ -144,8 +144,9 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     return;
   }
 
-  const eventStartDate = new Date(eventData.event_date + 'T' + eventData.start_time + 'Z');
-  const eventEndDate = new Date(eventData.event_date + 'T' + eventData.end_time + 'Z');
+  const eventStartDate = new Date(Number(eventData.event_date) * 1000); // Convert Unix timestamp to milliseconds
+  const duration = eventData.asset.duration || 0; // Default to 0 if duration is null
+  const eventEndDate = new Date(Number(eventData.event_date) * 1000 + duration * 1000); // Add duration in milliseconds
   const now = new Date();
 
   // Format dates for display in local timezone

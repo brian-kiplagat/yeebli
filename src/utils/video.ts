@@ -2,8 +2,8 @@ import 'plyr/dist/plyr.css';
 
 import Hls from 'hls.js';
 import Plyr from 'plyr';
+import type { EventData } from 'src/types/event';
 
-import type { EventData } from './eventStatus';
 import { EventStatus } from './eventStatus';
 
 export class Video {

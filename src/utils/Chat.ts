@@ -14,7 +14,7 @@ import { getFirestore } from 'firebase/firestore';
 
 import { firebaseConfig } from '../config/firebase-config';
 import type { ChatMessage } from '../types/chat';
-import type { EventData } from '../utils/eventStatus';
+import type { EventData } from '../types/event';
 import { formatChatDate, getUserFromStorage } from './reusables';
 
 export class Chat {

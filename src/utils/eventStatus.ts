@@ -1,5 +1,4 @@
-import type { EventData } from 'src/types/event';
-
+import type { EventData } from '../types/event';
 import { formatDate } from './reusables';
 
 export class EventStatus {

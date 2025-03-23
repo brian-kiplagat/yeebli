@@ -206,8 +206,17 @@ export class Chat {
       throw new Error('Chat form not found');
     }
 
+    // Remove all existing submit event listeners
+    const oldForm = this.chatForm.cloneNode(true);
+    if (this.chatForm.parentNode) {
+      this.chatForm.parentNode.replaceChild(oldForm, this.chatForm);
+      this.chatForm = oldForm as HTMLFormElement;
+    }
+
+    // Now attach your new submit listener
     this.chatForm.addEventListener('submit', async (e: Event) => {
       e.preventDefault();
+      e.stopPropagation();
 
       const form = e.target as HTMLFormElement;
       const messageInput = form.querySelector<HTMLInputElement>('input[type="text"]');

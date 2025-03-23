@@ -6,6 +6,7 @@ export interface EventData {
   start_time: string;
   end_time: string;
   asset_id: number;
+  status: 'active' | 'cancelled' | 'suspended';
   created_at: string;
   updated_at: string;
   host_id: number;

@@ -180,21 +180,25 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     }, 1000);
   };
 
-  // If event has ended
-  if (now > eventEndDate) {
+  if (eventData.status === 'cancelled') {
+    //event is cancelled
+    eventStatus.updateStatus(eventData, 'cancelled');
+  } else if (eventData.status === 'suspended') {
+    //event is suspended
+    eventStatus.updateStatus(eventData, 'suspended');
+  } else if (now > eventEndDate) {
+    //event has ended
     event_finished_wrapper.style.display = 'block';
     eventStatus.updateStatus(eventData, 'ended');
-  }
-  // If event is ongoing
-  else if (now > eventStartDate) {
+  } else if (now > eventStartDate) {
+    //event is ongoing
     videoElement.style.display = 'flex';
     eventStatus.updateStatus(eventData, 'live');
     initializePlayer(videoElement, eventData);
     setupEndTimeCheck();
     initializeChat(eventData);
-  }
-  // If event hasn't started
-  else {
+  } else {
+    //event hasn't started
     countdown_wrapper.style.display = 'block';
     eventStatus.updateStatus(eventData, 'early');
     const countdown = new Countdown(countdownElement, eventStartDate, {

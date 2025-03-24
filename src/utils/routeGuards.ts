@@ -1,28 +1,16 @@
-interface RouteGuardOptions {
-  redirectPath?: string;
-  requireAuth?: boolean;
-}
-
-interface ProtectedRoute {
-  path: string;
-  requireAuth?: boolean;
-  redirectPath?: string;
-}
-
 export class RouteGuard {
-  private static protectedPaths: ProtectedRoute[] = [
-    { path: '/host/dashboard-host-view-leads', requireAuth: true },
-    { path: '/host/dashboard-host-add-leads', requireAuth: true },
-    { path: '/host/dashboard-host-add-event', requireAuth: true },
-    { path: '/host/dashboard-host-view-events', requireAuth: true },
-    { path: '/host/dashboard-host-view-assets', requireAuth: true },
-    { path: '/host/dashboard-host-view-owner', requireAuth: true },
-    { path: '/host/dashboard-host-billing', requireAuth: true },
-    { path: '/host/dashboard-host-view-hosts', requireAuth: true },
-    { path: '/host/dashboard-host', requireAuth: true },
-    { path: '/profile', requireAuth: true },
-    { path: '/settings', requireAuth: true, redirectPath: '/custom-login' },
-    // Add more protected paths as needed
+  private static protectedPaths: string[] = [
+    '/host/dashboard-host-view-leads',
+    '/host/dashboard-host-add-leads',
+    '/host/dashboard-host-add-event',
+    '/host/dashboard-host-view-events',
+    '/host/dashboard-host-view-assets',
+    '/host/dashboard-host-view-owner',
+    '/host/dashboard-host-billing',
+    '/host/dashboard-host-view-hosts',
+    '/host/dashboard-host',
+    '/profile',
+    '/settings',
   ];
 
   private static authToken: string;
@@ -36,76 +24,66 @@ export class RouteGuard {
   }
 
   private static async isAuthenticated(): Promise<boolean> {
-    // Don't redirect if we're already on onboarding pages
-    if (window.location.pathname.startsWith('/onboarding')) {
-      return true;
-    }
+    try {
+      const response = await fetch('https://api.3themind.com/v1/user/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.authToken}`,
+        },
+      });
 
-    if (!this.authToken) {
-      window.location.href = '/onboarding/login?error=unauthorized';
-      return false;
-    }
-
-    // Confirm authToken is actually valid by posting to server with bearer token
-    const response = await fetch('https://api.3themind.com/v1/user/me', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.authToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      window.location.href = '/onboarding/login?error=unauthorized';
-      return false;
-    }
-
-    const data = await response.json();
-    const userObject = data.data.user;
-
-    localStorage.setItem('user', JSON.stringify(userObject));
-
-    return true;
-  }
-
-  private static getCurrentPath(): string {
-    return window.location.pathname;
-  }
-
-  private static matchPath(protectedPath: string, currentPath: string): boolean {
-    // Simple path matching - you can make this more sophisticated
-    return currentPath.startsWith(protectedPath);
-  }
-
-  static async checkAccess(options: RouteGuardOptions = {}): Promise<boolean> {
-    const currentPath = this.getCurrentPath();
-    const matchedRoute = this.protectedPaths.find((route) =>
-      this.matchPath(route.path, currentPath)
-    );
-
-    if (!matchedRoute) {
-      return true; // Path is not protected
-    }
-
-    const {
-      redirectPath = options.redirectPath || '/onboarding/login?error=unauthorized',
-      requireAuth = options.requireAuth ?? true,
-    } = matchedRoute;
-
-    if (requireAuth) {
-      const authenticated = await this.isAuthenticated();
-      console.log('authenticated', authenticated);
-      if (!authenticated) {
-        console.error('not authenticated, kicking out');
-        window.location.href = redirectPath;
+      if (!response.ok) {
         return false;
       }
-    }
 
-    return true;
+      const data = await response.json();
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      return true;
+    } catch (error) {
+      console.error('Authentication check failed:', error);
+      return false;
+    }
+  }
+
+  static async checkAccess(): Promise<boolean> {
+    try {
+      const currentPath = window.location.pathname;
+
+      // Skip checks if we're on onboarding/login pages
+      if (currentPath.startsWith('/onboarding')) {
+        return true;
+      }
+
+      // Check if any protected path is a prefix of the current path
+      const isProtectedPath = this.protectedPaths.some((protectedPath) => {
+        // Split paths into segments and compare
+        const currentSegments = currentPath.split('/').filter(Boolean);
+        const protectedSegments = protectedPath.split('/').filter(Boolean);
+
+        // Check if the protected path segments match the start of current path
+        return protectedSegments.every((segment, index) => currentSegments[index] === segment);
+      });
+
+      // If path is not in our protected paths array, allow access
+      if (!isProtectedPath) {
+        return true;
+      }
+
+      const authenticated = await this.isAuthenticated();
+
+      if (!authenticated) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Route guard check failed:', error);
+      return false;
+    }
   }
 }
 
 // Update the protectRoute function to handle async
-export const protectRoute = async (options?: RouteGuardOptions) => {
-  return await RouteGuard.checkAccess(options);
+export const protectRoute = async (): Promise<boolean> => {
+  return await RouteGuard.checkAccess();
 };

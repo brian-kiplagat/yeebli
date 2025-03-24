@@ -1,7 +1,6 @@
 import { Chat } from '$utils/Chat';
 import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
-import { greetUser } from '$utils/greet';
 import { formatDate } from '$utils/reusables';
 import { RouteGuard } from '$utils/routeGuards';
 import { Video } from '$utils/video';
@@ -24,10 +23,6 @@ function addToHead(): void {
 }
 
 const initializeApp = async () => {
-  console.log('Initializing app');
-
-  greetUser();
-
   // Get auth tokens from cookies
   const cookies = document.cookie.split(';');
   const authToken = cookies.find((cookie) => cookie.trim().startsWith('token='))?.split('=')[1];
@@ -35,7 +30,11 @@ const initializeApp = async () => {
 
   // Set auth token for RouteGuard (even if null) and let it handle the auth check
   RouteGuard.setAuthToken(authToken || '');
-  await RouteGuard.checkAccess();
+  const isAuthenticated = await RouteGuard.checkAccess();
+  if (!isAuthenticated) {
+    window.location.href = '/onboarding/login';
+    return;
+  }
 
   // Only continue with initialization if we have valid auth
   if (authToken && user) {

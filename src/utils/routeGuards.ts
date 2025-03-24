@@ -17,6 +17,7 @@ export class RouteGuard {
     { path: '/host/dashboard-host-view-events', requireAuth: true },
     { path: '/host/dashboard-host-view-assets', requireAuth: true },
     { path: '/host/dashboard-host-view-owner', requireAuth: true },
+    { path: '/host/dashboard-host-billing', requireAuth: true },
     { path: '/host/dashboard-host-view-hosts', requireAuth: true },
     { path: '/host/dashboard-host', requireAuth: true },
     { path: '/profile', requireAuth: true },

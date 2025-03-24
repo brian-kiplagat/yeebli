@@ -10,4 +10,6 @@ export interface User {
   phone: string;
   profile_picture: string | null;
   role: string;
+  stripe_account_id: string | null;
+  subscription_status: string | null;
 }

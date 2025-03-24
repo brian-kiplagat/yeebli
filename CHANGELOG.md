@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.32
+
+### Patch Changes
+
+- 1ac8677: fix: login
+
 ## 1.1.31
 
 ### Patch Changes

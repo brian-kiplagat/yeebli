@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.1.31
+
+### Patch Changes
+
+- 6b1ee83: fix: form
+- 7ee998a: cancelled
+
 ## 1.1.30
 
 ### Patch Changes

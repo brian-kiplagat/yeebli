@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.33
+
+### Patch Changes
+
+- 5fe323e: fix: url
+
 ## 1.1.32
 
 ### Patch Changes

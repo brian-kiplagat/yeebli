@@ -32,7 +32,7 @@ const initializeApp = async () => {
   RouteGuard.setAuthToken(authToken || '');
   const isAuthenticated = await RouteGuard.checkAccess();
   if (!isAuthenticated) {
-    window.location.href = '/onboarding/login';
+    window.location.href = '/';
     return;
   }
 

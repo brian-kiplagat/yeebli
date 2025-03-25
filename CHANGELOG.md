@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.34
+
+### Patch Changes
+
+- 4b74d2d: fix: ts
+
 ## 1.1.33
 
 ### Patch Changes

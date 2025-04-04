@@ -15,7 +15,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from '../config/firebase-config';
 import type { ChatMessage } from '../types/chat';
 import type { EventData } from '../types/event';
-import { formatChatDate, getLeadFromStorage, getUserFromStorage } from './reusables';
+import { formatChatDate, getLeadFromStorage } from './reusables';
 
 export class Chat {
   private db: Firestore;
@@ -176,14 +176,14 @@ export class Chat {
     }
     if (deleteButton) {
       // Only show delete button if the looged in user is the host
-      const user = getUserFromStorage();
-      deleteButton.style.display = user?.id === this.eventData.host_id ? 'block' : 'none';
+      const lead = getLeadFromStorage();
+      deleteButton.style.display = lead?.id === this.eventData.host_id ? 'block' : 'none';
       // Add click handler for delete
       deleteButton.addEventListener('click', () => this.deleteMessage(message.id));
     }
-    // Add class that aligns the message to the right for current user, and to the left for other users
-    const user = getUserFromStorage();
-    if (message.senderId === user?.id.toString()) {
+    // Add class that aligns the message to the right for current logged in lead, and to the left for other users
+    const lead = getLeadFromStorage();
+    if (message.senderId === lead?.id.toString()) {
       clone.classList.add('right');
       message_inner_wrapper?.classList.add('right');
       messageText?.classList.add('right');
@@ -225,10 +225,11 @@ export class Chat {
 
       try {
         const lead = getLeadFromStorage();
-        if (!lead) {
-          return;
+        if (!lead || !lead.id) {
+          throw new Error('Lead or lead id not found');
         }
-        await this.sendMessage(String(lead.id), lead.name, messageInput.value.trim());
+        const isHost = lead.id === this.eventData.host_id;
+        await this.sendMessage(String(lead.id), lead.name, messageInput.value.trim(), isHost);
         messageInput.value = ''; // Clear input after successful send
       } catch (error) {
         console.error('Error sending message:', error);
@@ -242,10 +243,19 @@ export class Chat {
    * @param text - The message text
    * @returns The ID of the new message
    */
-  async sendMessage(senderId: string, name: string, text: string): Promise<string> {
+  async sendMessage(
+    senderId: string,
+    name: string,
+    text: string,
+    isHost: boolean
+  ): Promise<string> {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
+    if (!senderId) {
+      throw new Error('Sender ID not found');
+    }
+
     const messagesRef = collection(this.db, 'events', this.eventData.id.toString(), 'messages');
 
     const docRef = await addDoc(messagesRef, {
@@ -253,6 +263,7 @@ export class Chat {
       name,
       text,
       timestamp: serverTimestamp(),
+      isHost,
     });
 
     return docRef.id;

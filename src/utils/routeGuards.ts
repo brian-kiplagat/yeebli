@@ -43,7 +43,15 @@ export class RouteGuard {
       }
 
       const data = await response.json();
-      localStorage.setItem('user', JSON.stringify(data.data.user));
+      const { user } = data.data;
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Dispatch user update event
+      const userEvent = new CustomEvent('userUpdate', {
+        detail: { user },
+      });
+      document.dispatchEvent(userEvent);
+
       return true;
     } catch (error) {
       console.error('Authentication check failed:', error);

@@ -1,5 +1,13 @@
 # @finsweet/developer-starter
 
+## 1.1.35
+
+### Patch Changes
+
+- c9ae95b: fix: paths
+- 378cdfb: fix: names
+- d80f5ed: fix: messages
+
 ## 1.1.34
 
 ### Patch Changes

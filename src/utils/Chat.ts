@@ -15,7 +15,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from '../config/firebase-config';
 import type { ChatMessage } from '../types/chat';
 import type { EventData } from '../types/event';
-import { formatChatDate, getUserFromStorage } from './reusables';
+import { formatChatDate, getLeadFromStorage, getUserFromStorage } from './reusables';
 
 export class Chat {
   private db: Firestore;
@@ -224,11 +224,11 @@ export class Chat {
       if (!messageInput || !messageInput.value.trim()) return;
 
       try {
-        const user = getUserFromStorage();
-        if (!user) {
+        const lead = getLeadFromStorage();
+        if (!lead) {
           return;
         }
-        await this.sendMessage(user.id.toString(), messageInput.value.trim());
+        await this.sendMessage(String(lead.id), lead.name, messageInput.value.trim());
         messageInput.value = ''; // Clear input after successful send
       } catch (error) {
         console.error('Error sending message:', error);
@@ -242,7 +242,7 @@ export class Chat {
    * @param text - The message text
    * @returns The ID of the new message
    */
-  async sendMessage(senderId: string, text: string): Promise<string> {
+  async sendMessage(senderId: string, name: string, text: string): Promise<string> {
     if (!this.db) {
       throw new Error('Database not initialized');
     }
@@ -250,6 +250,7 @@ export class Chat {
 
     const docRef = await addDoc(messagesRef, {
       senderId,
+      name,
       text,
       timestamp: serverTimestamp(),
     });

@@ -30,3 +30,16 @@ export interface User {
   is_banned: boolean;
   is_deleted: boolean;
 }
+
+export interface Lead {
+  isAllowed: boolean;
+  message: string;
+  name: string;
+  email: string;
+  phone: string;
+  membership_level: string;
+  membership_active: boolean;
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+}

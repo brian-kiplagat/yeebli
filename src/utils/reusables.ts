@@ -1,4 +1,4 @@
-import type { User } from './types';
+import type { Lead, User } from '../types/chat';
 
 export const getUserFromStorage = (): User | null => {
   const userString = localStorage.getItem('user');
@@ -7,6 +7,15 @@ export const getUserFromStorage = (): User | null => {
     return null;
   }
   return JSON.parse(userString) as User;
+};
+
+export const getLeadFromStorage = (): Lead | null => {
+  const leadString = localStorage.getItem('lead');
+  if (!leadString) {
+    console.error('Lead not found');
+    return null;
+  }
+  return JSON.parse(leadString) as Lead;
 };
 
 type DateFormat =

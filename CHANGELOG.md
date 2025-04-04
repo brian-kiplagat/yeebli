@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.36
+
+### Patch Changes
+
+- 30f04bf: fix: event
+
 ## 1.1.35
 
 ### Patch Changes

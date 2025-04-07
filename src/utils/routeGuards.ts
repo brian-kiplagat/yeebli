@@ -14,6 +14,8 @@ export class RouteGuard {
     { path: '/host/dashboard-host-update-profile', requireSubscription: true },
     { path: '/host/dashboard-host-update-business', requireSubscription: true },
     { path: '/host/dashboard-host-security', requireSubscription: true },
+    { path: '/host/invite-team-member', requireSubscription: true },
+    { path: '/host/view-team-members', requireSubscription: true },
     { path: '/host/dashboard-host', requireSubscription: true },
     { path: '/profile', requireSubscription: false },
     { path: '/settings', requireSubscription: false },

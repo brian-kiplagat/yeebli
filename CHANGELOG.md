@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.38
+
+### Patch Changes
+
+- a0f0069: fix: user watch
+
 ## 1.1.37
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.37
+
+### Patch Changes
+
+- 6fd9a94: fix: urls
+
 ## 1.1.36
 
 ### Patch Changes

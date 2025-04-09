@@ -27,7 +27,48 @@ const initializeApp = async () => {
   const cookies = document.cookie.split(';');
   const authToken = cookies.find((cookie) => cookie.trim().startsWith('token='))?.split('=')[1];
   const user = cookies.find((cookie) => cookie.trim().startsWith('user='))?.split('=')[1];
+  //video can be watched by anyone
+  //if pathname is /eventPage, then init the player
+  if (window.location.pathname === '/eventpage') {
+    // Add Plyr CSS and JS to the head
+    addToHead();
+    // Get event code from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventCode = urlParams.get('code');
 
+    if (!eventCode) {
+      console.error('No event code found in URL');
+      return;
+    }
+
+    try {
+      // Fetch event data
+      const response = await fetch(`https://api.3themind.com/v1/event/${eventCode}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch event data');
+      }
+
+      const eventData: EventData = await response.json();
+      console.log('Event data:', eventData);
+
+      const video = document.querySelector('[wized="video_player"]') as HTMLElement;
+      setupMetadata(eventData);
+      if (!video) {
+        console.error('No video found');
+        return;
+      }
+      // Initialize countdown with event data
+      initializeCountdown(eventData, video);
+    } catch (error) {
+      console.error('Error fetching event data:', error);
+    }
+  }
   // Set auth token for RouteGuard (even if null) and let it handle the auth check
   RouteGuard.setAuthToken(authToken || '');
   const isAuthenticated = await RouteGuard.checkAccess();
@@ -44,48 +85,6 @@ const initializeApp = async () => {
       // Initialize Webflow
       const videoModal = new VideoModal();
       videoModal.addToHead();
-    }
-
-    //if pathname is /eventPage, then init the player
-    if (window.location.pathname === '/eventpage') {
-      // Add Plyr CSS and JS to the head
-      addToHead();
-      // Get event code from URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const eventCode = urlParams.get('code');
-
-      if (!eventCode) {
-        console.error('No event code found in URL');
-        return;
-      }
-
-      try {
-        // Fetch event data
-        const response = await fetch(`https://api.3themind.com/v1/event/${eventCode}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch event data');
-        }
-
-        const eventData: EventData = await response.json();
-        console.log('Event data:', eventData);
-
-        const video = document.querySelector('[wized="video_player"]') as HTMLElement;
-        setupMetadata(eventData);
-        if (!video) {
-          console.error('No video found');
-          return;
-        }
-        // Initialize countdown with event data
-        initializeCountdown(eventData, video);
-      } catch (error) {
-        console.error('Error fetching event data:', error);
-      }
     }
   }
 };

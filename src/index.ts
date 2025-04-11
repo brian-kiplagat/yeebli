@@ -29,7 +29,7 @@ const initializeApp = async () => {
   const user = cookies.find((cookie) => cookie.trim().startsWith('user='))?.split('=')[1];
   //video can be watched by anyone
   //if pathname is /eventPage, then init the player
-  if (window.location.pathname === '/eventpage') {
+  if (window.location.pathname === '/events/event') {
     // Add Plyr CSS and JS to the head
     addToHead();
     // Get event code from URL

@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.1.40
+
+### Patch Changes
+
+- c4a930e: gix: app urls
+
 ## 1.1.39
 
 ### Patch Changes

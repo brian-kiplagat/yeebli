@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.0
+
+### Minor Changes
+
+- 37eab19: fix: minor
+
 ## 1.1.40
 
 ### Patch Changes

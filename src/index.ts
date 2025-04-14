@@ -104,11 +104,17 @@ window.Webflow.push(() => {
 
 const setupMetadata = (eventData: EventData) => {
   const event_page_name = document.querySelector('[wized="event_page_name"]');
+  const event_page_description = document.querySelector('[wized="event_page_description"]');
 
   if (event_page_name) {
     event_page_name.textContent = eventData.event_name;
   } else {
     console.error('No event_page_name found');
+  }
+  if (event_page_description) {
+    event_page_description.textContent = eventData.event_description;
+  } else {
+    console.error('No event_page_description found');
   }
 };
 

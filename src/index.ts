@@ -141,19 +141,35 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     console.error('Missing element: [wized="event_finished_wrapper"]');
     return;
   }
-
-  const eventStartDate = new Date(Number(eventData.event_date) * 1000); // Convert Unix timestamp to milliseconds
-  const duration = eventData.asset.duration || 0; // Default to 0 if duration is null
-  const eventEndDate = new Date(Number(eventData.event_date) * 1000 + duration * 1000); // Add duration in milliseconds
+  // Initialize event status handler
+  const eventStatus = new EventStatus();
+  // Sort dates and find the next upcoming date
   const now = new Date();
+  const sortedDates = eventData.dates
+    .map((date) => ({
+      start: new Date(Number(date.date) * 1000),
+      end: new Date(Number(date.date) * 1000 + eventData.asset.duration * 1000),
+    }))
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+  const nextDate = sortedDates.find((date) => date.end > now);
+
+  if (!nextDate) {
+    // All dates have passed
+    eventStatus.updateStatus(eventData, 'ended');
+    event_finished_wrapper.style.display = 'block';
+    videoElement.style.display = 'none';
+    countdown_wrapper.style.display = 'none';
+    return;
+  }
+
+  const eventStartDate = nextDate.start;
+  const eventEndDate = nextDate.end;
 
   // Format dates for display in local timezone
   const formattedStartDate = formatDate(eventStartDate, 'DD MMM YYYY HH:mm');
   const formattedEndDate = formatDate(eventEndDate, 'DD MMM YYYY HH:mm');
   console.log({ formattedStartDate, formattedEndDate });
-
-  // Initialize event status handler
-  const eventStatus = new EventStatus();
 
   // Hide all elements initially
   countdown_wrapper.style.display = 'none';

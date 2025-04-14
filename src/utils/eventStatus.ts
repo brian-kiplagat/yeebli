@@ -46,9 +46,19 @@ export class EventStatus {
       }
       case 'ended': {
         const duration = eventData.asset.duration || 0;
+        const nextDate = eventData.dates
+          .map((date) => ({
+            start: new Date(Number(date.date) * 1000),
+            end: new Date(Number(date.date) * 1000 + duration * 1000),
+          }))
+          .sort((a, b) => a.start.getTime() - b.start.getTime())
+          .find((date) => date.end > new Date());
 
-        const endDate = new Date(Number(eventData.event_date) * 1000 + duration * 1000);
-        this.event_status_text.textContent = `Event Ended ${formatDate(endDate, 'DD MMM YYYY HH:mm')}`;
+        if (nextDate) {
+          this.event_status_text.textContent = `Event Ended ${formatDate(nextDate.end, 'DD MMM YYYY HH:mm')}`;
+        } else {
+          this.event_status_text.textContent = 'Event Ended';
+        }
         this.event_status_wrapper.classList.remove('case_live', 'case_early');
         this.event_status_wrapper.classList.add('case_ended');
         if (this.chat_collumn) this.chat_collumn.style.display = 'none';
@@ -66,8 +76,19 @@ export class EventStatus {
         if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
         break;
       case 'early': {
-        const startDate = new Date(Number(eventData.event_date) * 1000);
-        this.event_status_text.textContent = `Event starts ${formatDate(startDate, 'DD MMM YYYY HH:mm')}`;
+        const nextDate = eventData.dates
+          .map((date) => ({
+            start: new Date(Number(date.date) * 1000),
+            end: new Date(Number(date.date) * 1000 + eventData.asset.duration * 1000),
+          }))
+          .sort((a, b) => a.start.getTime() - b.start.getTime())
+          .find((date) => date.end > new Date());
+
+        if (nextDate) {
+          this.event_status_text.textContent = `Event starts ${formatDate(nextDate.start, 'DD MMM YYYY HH:mm')}`;
+        } else {
+          this.event_status_text.textContent = 'Event starts soon';
+        }
         this.event_status_wrapper.classList.remove('case_ended', 'case_live');
         this.event_status_wrapper.classList.add('case_early');
         if (this.chat_collumn) this.chat_collumn.style.display = 'none';

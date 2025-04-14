@@ -25,7 +25,6 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development node ./bin/build.js",
     "build": "cross-env NODE_ENV=production node ./bin/build.js",
-    "publish": "pnpm publish --access public",
     "lint": "eslint ./src && prettier --check ./src",
     "lint:fix": "eslint ./src --fix",
     "check": "tsc --noEmit",

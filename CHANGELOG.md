@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.2
+
+### Patch Changes
+
+- 9fbc288: fix: clean
+
 ## 1.2.1
 
 ### Patch Changes

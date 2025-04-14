@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.1
+
+### Patch Changes
+
+- 2194dc1: fix: times
+
 ## 1.2.0
 
 ### Minor Changes

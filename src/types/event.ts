@@ -1,9 +1,10 @@
 export interface EventDate {
   id: number;
-  event_id: number;
+  membership_id: number;
   date: string; // Unix timestamp as string
   created_at: string;
   updated_at: string;
+  user_id: number;
 }
 
 export interface EventAsset {
@@ -33,31 +34,32 @@ export interface EventMembership {
   name: string;
   description: string;
   price: number;
-  payment_type: 'one_off' | string; // Add other payment types if needed
+  payment_type: 'one_off' | string;
+  price_point: string;
+  billing: string;
   created_at: string;
   updated_at: string;
   user_id: number;
+  dates: EventDate[];
 }
 
 export interface EventData {
   id: number;
   event_name: string;
   event_description: string;
-  event_type: 'prerecorded' | string; // Add other event types if needed
+  event_type: 'prerecorded' | string;
   asset_id: number;
   created_at: string;
-  status: 'active' | string; // Add other status types if needed
+  status: 'active' | 'cancelled' | string;
   live_video_url: string;
   success_url: string;
   instructions: string;
   landing_page_url: string;
   live_venue_address: string;
-  dates: EventDate[];
-  membership_id: number;
   updated_at: string;
   host_id: number;
   asset: EventAsset;
   host: EventHost;
   leadCount: number;
-  membership: EventMembership;
+  memberships: EventMembership[];
 }

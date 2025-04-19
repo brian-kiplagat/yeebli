@@ -56,7 +56,6 @@ const initializeApp = async () => {
 
       const eventData: EventData = await response.json();
       console.log('Event data:', eventData);
-
       const video = document.querySelector('[wized="video_player"]') as HTMLElement;
       setupMetadata(eventData);
       if (!video) {
@@ -127,7 +126,7 @@ const initializePlayer = (video: HTMLElement, eventData: EventData) => {
   return { player, videoElement: video };
 };
 
-const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) => {
+const initializeCountdown = async (eventData: EventData, videoElement: HTMLElement) => {
   const countdownElement = document.querySelector<HTMLElement>('[wized="countdown_timer"]');
   const countdown_wrapper = document.querySelector<HTMLElement>('[wized="countdown_wrapper"]');
   const event_finished_wrapper = document.querySelector<HTMLElement>(
@@ -147,22 +146,46 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
     console.error('Missing element: [wized="event_finished_wrapper"]');
     return;
   }
+  //get membership data via post request.
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const membershipData = await fetch(`https://api.3themind.com/v1/lead/lead-validate-event`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      token: urlParams.get('token'),
+      email: urlParams.get('email'),
+      event_id: Number(urlParams.get('code')),
+    }),
+  });
+  const data = await membershipData.json();
+  const { membership_level } = data;
+  //use membership level to get dates
   // Initialize event status handler
   const eventStatus = new EventStatus();
   // Sort dates and find the next upcoming date
+  const dates = eventData.memberships.find(
+    (membership) => membership.id === membership_level
+  )?.dates;
+  if (!dates) {
+    console.error('No dates found');
+    return;
+  }
   const now = new Date();
-  const sortedDates = eventData.dates
+  const sortedDates = dates
     .map((date) => ({
       start: new Date(Number(date.date) * 1000),
       end: new Date(Number(date.date) * 1000 + eventData.asset.duration * 1000),
     }))
     .sort((a, b) => a.start.getTime() - b.start.getTime());
-
+  console.log({ sortedDates });
   const nextDate = sortedDates.find((date) => date.end > now);
 
   if (!nextDate) {
     // All dates have passed
-    eventStatus.updateStatus(eventData, 'ended');
+    eventStatus.updateStatus('ended');
     event_finished_wrapper.style.display = 'block';
     videoElement.style.display = 'none';
     countdown_wrapper.style.display = 'none';
@@ -189,38 +212,38 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
       const timeLeft = Math.round((eventEndDate.getTime() - now.getTime()) / 1000);
 
       if (timeLeft <= 20 && timeLeft > 0) {
-        eventStatus.updateStatus(eventData, 'live', timeLeft);
+        eventStatus.updateStatus('live', timeLeft);
       }
       if (now > eventEndDate) {
         clearInterval(endCheckInterval);
         videoElement.style.display = 'none';
         event_finished_wrapper.style.display = 'block';
-        eventStatus.updateStatus(eventData, 'ended');
+        eventStatus.updateStatus('ended', undefined, nextDate);
       }
     }, 1000);
   };
 
   if (eventData.status === 'cancelled') {
     //event is cancelled
-    eventStatus.updateStatus(eventData, 'cancelled');
+    eventStatus.updateStatus('cancelled');
   } else if (eventData.status === 'suspended') {
     //event is suspended
-    eventStatus.updateStatus(eventData, 'suspended');
+    eventStatus.updateStatus('suspended');
   } else if (now > eventEndDate) {
     //event has ended
     event_finished_wrapper.style.display = 'block';
-    eventStatus.updateStatus(eventData, 'ended');
+    eventStatus.updateStatus('ended', undefined, nextDate);
   } else if (now > eventStartDate) {
     //event is ongoing
     videoElement.style.display = 'flex';
-    eventStatus.updateStatus(eventData, 'live');
+    eventStatus.updateStatus('live');
     initializePlayer(videoElement, eventData);
     setupEndTimeCheck();
     initializeChat(eventData);
   } else {
     //event hasn't started
     countdown_wrapper.style.display = 'block';
-    eventStatus.updateStatus(eventData, 'early');
+    eventStatus.updateStatus('early', undefined, nextDate);
     const countdown = new Countdown(countdownElement, eventStartDate, {
       threshold: '0',
       reset: 'false',
@@ -228,7 +251,7 @@ const initializeCountdown = (eventData: EventData, videoElement: HTMLElement) =>
         countdown_wrapper.style.display = 'none';
         videoElement.style.display = 'flex';
         initializePlayer(videoElement, eventData);
-        eventStatus.updateStatus(eventData, 'live');
+        eventStatus.updateStatus('live');
         setupEndTimeCheck();
         initializeChat(eventData);
       },

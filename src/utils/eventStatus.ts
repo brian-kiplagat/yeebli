@@ -1,4 +1,3 @@
-import type { EventData } from '../types/event';
 import { formatDate } from './reusables';
 
 export class EventStatus {
@@ -19,9 +18,9 @@ export class EventStatus {
   }
 
   updateStatus(
-    eventData: EventData,
     status: 'ended' | 'live' | 'early' | 'cancelled' | 'suspended',
-    countdown?: number
+    countdown?: number,
+    nextDate?: { start: Date; end: Date }
   ): void {
     if (!this.event_status_text || !this.event_status_wrapper) return;
 
@@ -45,15 +44,6 @@ export class EventStatus {
         break;
       }
       case 'ended': {
-        const duration = eventData.asset.duration || 0;
-        const nextDate = eventData.dates
-          .map((date) => ({
-            start: new Date(Number(date.date) * 1000),
-            end: new Date(Number(date.date) * 1000 + duration * 1000),
-          }))
-          .sort((a, b) => a.start.getTime() - b.start.getTime())
-          .find((date) => date.end > new Date());
-
         if (nextDate) {
           this.event_status_text.textContent = `Event Ended ${formatDate(nextDate.end, 'DD MMM YYYY HH:mm')}`;
         } else {
@@ -76,14 +66,6 @@ export class EventStatus {
         if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
         break;
       case 'early': {
-        const nextDate = eventData.dates
-          .map((date) => ({
-            start: new Date(Number(date.date) * 1000),
-            end: new Date(Number(date.date) * 1000 + eventData.asset.duration * 1000),
-          }))
-          .sort((a, b) => a.start.getTime() - b.start.getTime())
-          .find((date) => date.end > new Date());
-
         if (nextDate) {
           this.event_status_text.textContent = `Event starts ${formatDate(nextDate.start, 'DD MMM YYYY HH:mm')}`;
         } else {

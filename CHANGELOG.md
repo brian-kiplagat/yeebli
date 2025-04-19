@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.3
+
+### Patch Changes
+
+- 91955a1: fix: description
+
 ## 1.2.2
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.2.5
+
+### Patch Changes
+
+- f8179c8: fiz: optimisations
+- 413c372: fix: event dates
+
 ## 1.2.4
 
 ### Patch Changes

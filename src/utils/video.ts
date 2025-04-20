@@ -5,6 +5,7 @@ import Plyr from 'plyr';
 import type { EventData } from 'src/types/event';
 
 import { EventStatus } from './eventStatus';
+import { showError } from './reusables';
 
 export class Video {
   private player: Plyr | null = null;
@@ -61,10 +62,10 @@ export class Video {
       // Check autoplay policy
       if (navigator.getAutoplayPolicy) {
         const autoplayPolicy = navigator.getAutoplayPolicy('mediaelement');
-        console.log('Autoplay policy:', autoplayPolicy);
+        console.error('Autoplay policy:', autoplayPolicy);
 
         if (autoplayPolicy === 'disallowed') {
-          console.log('Autoplay is not allowed');
+          showError('Autoplay is not allowed. Please press the play button to start the stream');
           // Handle disallowed case - maybe show a play button
           return;
         }
@@ -92,16 +93,17 @@ export class Video {
       // Handle autoplay errors
       this.player.on('error', () => {
         const { error } = videoElement;
-        console.error('Playback error:', error);
+        showError('An error occurred while playing this video');
+        console.error(error);
         if (error?.code === 4) {
           // MEDIA_ERR_ABORTED
-          console.log('Autoplay was blocked');
+          showError(
+            'Autoplay was blocked due to browser policy. Please press the play button to start the stream'
+          );
         }
       });
 
-      this.player.on('ended', () => {
-        console.log('Video ended');
-      });
+      this.player.on('ended', () => {});
 
       // Save progress before unload
       window.addEventListener('beforeunload', () => {
@@ -118,7 +120,6 @@ export class Video {
 
       // Handle HLS manifest parsed event
       this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log('HLS manifest parsed successfully');
         startPlayback(video);
       });
 
@@ -128,15 +129,15 @@ export class Video {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              console.log('Network error, attempting to recover...');
+              showError('Network error, attempting to recover...');
               this.hls?.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              console.log('Media error, attempting to recover...');
+              showError('Media error, attempting to recover...');
               this.hls?.recoverMediaError();
               break;
             default:
-              console.error('Fatal HLS error, destroying...');
+              showError('Fatal HLS error, destroying...');
               this.cleanup();
               break;
           }
@@ -153,7 +154,6 @@ export class Video {
       // Regular video playback
       video.setAttribute('src', media_url);
       startPlayback(video);
-      console.log('Regular video player initialized');
     }
 
     const cleanup = () => {

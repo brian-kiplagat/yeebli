@@ -1,7 +1,7 @@
 import { Chat } from '$utils/Chat';
 import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
-import { formatDate } from '$utils/reusables';
+import { formatDate, showError } from '$utils/reusables';
 import { RouteGuard } from '$utils/routeGuards';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
@@ -19,6 +19,11 @@ function addToHead(): void {
     plyrCss.href = 'https://cdn.plyr.io/3.7.8/plyr.css';
     plyrCss.rel = 'stylesheet';
     document.head.appendChild(plyrCss);
+    //<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
+    const notyfCss = document.createElement('link');
+    notyfCss.href = 'https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css';
+    notyfCss.rel = 'stylesheet';
+    document.head.appendChild(notyfCss);
   }
 }
 
@@ -37,9 +42,10 @@ const initializeApp = async () => {
     const event_id = urlParams.get('code');
     const email = urlParams.get('email');
     const token = urlParams.get('token');
+    const isHost = urlParams.get('isHost');
 
     if (!event_id) {
-      console.error('No event code found in URL');
+      showError('Event Id not found.Ensure you have the correct event link');
       return;
     }
 
@@ -55,26 +61,29 @@ const initializeApp = async () => {
           event_id: Number(event_id),
           email: email,
           token: token,
+          isHost: Boolean(isHost),
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch event data');
+        const error = await response.json();
+        showError(error.error || error.message || 'Failed to fetch event data');
+        return;
       }
 
       const streamResponse: StreamResponse = await response.json();
       const eventData = streamResponse.event;
-      console.log('Event data:', eventData);
       const video = document.querySelector('[wized="video_player"]') as HTMLElement;
       setupMetadata(eventData);
       if (!video) {
-        console.error('No video found');
+        showError('We could not find a video for this event');
         return;
       }
       // Initialize countdown with event data
       initializeCountdown(eventData, video, streamResponse.selectedDates);
     } catch (error) {
       console.error('Error fetching event data:', error);
+      showError('An error occurred while fetching this event');
     }
   }
   // Set auth token for RouteGuard (even if null) and let it handle the auth check
@@ -100,7 +109,6 @@ const initializeApp = async () => {
 // Initialize Webflow
 window.Webflow ||= [];
 window.Webflow.push(() => {
-  console.log('Webflow loaded');
   // Check if DOM is already loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeApp);
@@ -116,22 +124,16 @@ const setupMetadata = (eventData: EventData) => {
 
   if (event_page_name) {
     event_page_name.textContent = eventData.event_name;
-  } else {
-    console.error('No event_page_name found');
   }
   if (event_page_description) {
     event_page_description.textContent = eventData.event_description;
-  } else {
-    console.error('No event_page_description found');
   }
 };
 
 const initializePlayer = (video: HTMLElement, eventData: EventData) => {
-  console.log({ video, eventData });
   const videoUrl = eventData.asset.presignedUrl;
   const eventStatus = new EventStatus();
   const player = new Video(videoUrl, video, eventStatus, eventData);
-  console.log('Player instance:', player);
   return { player, videoElement: video };
 };
 
@@ -169,7 +171,6 @@ const initializeCountdown = async (
       end: new Date(Number(date.date) * 1000 + eventData.asset.duration * 1000),
     }))
     .sort((a, b) => a.start.getTime() - b.start.getTime());
-  console.log({ sortedDates });
   const nextDate = sortedDates.find((date) => date.end > now);
 
   if (!nextDate) {
@@ -187,7 +188,14 @@ const initializeCountdown = async (
   // Format dates for display in local timezone
   const formattedStartDate = formatDate(eventStartDate, 'DD MMM YYYY HH:mm');
   const formattedEndDate = formatDate(eventEndDate, 'DD MMM YYYY HH:mm');
-  console.log({ formattedStartDate, formattedEndDate });
+  console.log({
+    formattedStartDate,
+    formattedEndDate,
+    sortedDates,
+    nextDate,
+    eventStartDate,
+    eventEndDate,
+  });
 
   // Hide all elements initially
   countdown_wrapper.style.display = 'none';
@@ -252,8 +260,8 @@ const initializeCountdown = async (
 
 const initializeChat = (eventData: EventData) => {
   const chat = new Chat(eventData);
-  chat.init((messages) => {
+  chat.init(() => {
     // Handle new messages here
-    console.log('New messages:', messages);
+    //console.log('New messages:', messages);
   });
 };

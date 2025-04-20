@@ -57,6 +57,7 @@
     "@finsweet/ts-utils": "^0.40.0",
     "firebase": "^11.4.0",
     "hls.js": "^1.5.20",
+    "notyf": "^3.10.0",
     "plyr": "^3.7.8"
   },
   "engines": {

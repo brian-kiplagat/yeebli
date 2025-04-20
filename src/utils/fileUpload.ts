@@ -1,3 +1,5 @@
+import { showError } from './reusables';
+
 interface PresignedUrlResponse {
   presignedUrl: string;
   url: string;
@@ -43,13 +45,13 @@ export class FileUploader {
     ) as HTMLElement;
 
     if (!this.upload_progress_wrapper) {
-      console.warn('Progress bar wrapper not found');
+      console.error('Progress bar wrapper not found');
     }
     if (!this.upload_progress_bar) {
-      console.warn('Progress bar not found');
+      console.error('Progress bar not found');
     }
     if (!this.upload_progress_counter) {
-      console.warn('Progress counter not found');
+      console.error('Progress counter not found');
     }
   }
   /**
@@ -147,7 +149,8 @@ export class FileUploader {
           });
           document.dispatchEvent(metadataEvent);
         } catch (error) {
-          console.warn('Failed to get video duration:', error);
+          showError('An error occurred while getting the video duration');
+          console.error('Failed to get video duration:', error);
         }
       }
 
@@ -190,7 +193,6 @@ export class FileUploader {
         // Handle upload completion
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            console.log('File uploaded successfully');
             //@ts-expect-error - Wized is injected by Webflow at runtime
             Wized.requests.execute('Get_Assets');
             resolve({
@@ -215,7 +217,8 @@ export class FileUploader {
         xhr.send(file);
       });
     } catch (error) {
-      console.error('File upload error:', error);
+      showError('An error occurred while uploading this file');
+      console.error(error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -274,7 +277,7 @@ export function initializeFileUpload(authToken: string) {
   const fileInput = document.querySelector('[wized="file_uploader"]') as HTMLInputElement;
 
   if (!fileInput) {
-    console.warn('File upload input not found');
+    showError('File upload input not found');
     return;
   }
 

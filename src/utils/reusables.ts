@@ -1,9 +1,11 @@
+import { Notyf } from 'notyf';
+
 import type { Lead, User } from '../types/chat';
 
 export const getUserFromStorage = (): User | null => {
   const userString = localStorage.getItem('user');
   if (!userString) {
-    console.error('User not found');
+    showError('User not found');
     return null;
   }
   return JSON.parse(userString) as User;
@@ -12,7 +14,7 @@ export const getUserFromStorage = (): User | null => {
 export const getLeadFromStorage = (): Lead | null => {
   const leadString = localStorage.getItem('lead');
   if (!leadString) {
-    console.error('Lead not found');
+    showError('Lead not found');
     return null;
   }
   return JSON.parse(leadString) as Lead;
@@ -123,4 +125,32 @@ export const formatChatDate = (date: string | Date): string => {
 
   // For other days, show short date with time
   return formatDate(d, 'DD MMM HH:mm');
+};
+
+export const showError = (message: string) => {
+  const notyf = new Notyf({
+    duration: 1000,
+    position: {
+      x: 'right',
+      y: 'top',
+    },
+    types: [
+      {
+        type: 'warning',
+        background: 'orange',
+        icon: {
+          className: 'material-icons',
+          tagName: 'i',
+          text: 'warning',
+        },
+      },
+      {
+        type: 'error',
+        background: 'indianred',
+        duration: 4000,
+        dismissible: true,
+      },
+    ],
+  });
+  notyf.error(message);
 };

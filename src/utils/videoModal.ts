@@ -2,6 +2,8 @@ import 'plyr/dist/plyr.css';
 
 import Plyr from 'plyr';
 
+import { showError } from './reusables';
+
 export class VideoModal {
   private player: Plyr | null = null;
   private observer: MutationObserver;
@@ -18,7 +20,7 @@ export class VideoModal {
         subtree: true,
       });
     } else {
-      console.warn('Could not find case container element');
+      console.error('Could not find case container element');
     }
   }
 
@@ -61,10 +63,10 @@ export class VideoModal {
       preview.addEventListener('click', () => {
         const videoUrl = preview.getAttribute('presigned');
         if (videoUrl) {
-          console.log('Opening video:', videoUrl);
           this.openVideoModal(videoUrl);
         } else {
-          console.warn('No presigned URL found for video preview', preview);
+          showError('No presigned URL found for video preview');
+          console.error('No presigned URL found for video preview', preview);
         }
       });
     });

@@ -90,4 +90,5 @@ export interface StreamResponse {
   membership: EventMembership;
   event: EventData;
   selectedDates: EventDate[];
+  isHost: boolean;
 }

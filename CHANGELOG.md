@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.4
+
+### Patch Changes
+
+- 631d7b9: fix: time
+
 ## 1.2.3
 
 ### Patch Changes

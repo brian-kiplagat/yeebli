@@ -63,3 +63,31 @@ export interface EventData {
   leadCount: number;
   memberships: EventMembership[];
 }
+
+export interface Lead {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  event_id: number;
+  registered_date: string | null;
+  membership_active: boolean;
+  form_identifier: string;
+  host_id: number;
+  token: string;
+  created_at: string;
+  updated_at: string;
+  status_identifier: string;
+  lead_status: string | null;
+  dates: number[];
+  source_url: string | null;
+  membership_level: number;
+  userId: number;
+}
+
+export interface StreamResponse {
+  lead: Lead;
+  membership: EventMembership;
+  event: EventData;
+  selectedDates: EventDate[];
+}

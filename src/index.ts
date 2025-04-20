@@ -6,7 +6,7 @@ import { RouteGuard } from '$utils/routeGuards';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
 
-import type { EventData } from './types/event';
+import type { EventData, EventDate, StreamResponse } from './types/event';
 import { EventStatus } from './utils/eventStatus';
 
 /**
@@ -34,27 +34,36 @@ const initializeApp = async () => {
     addToHead();
     // Get event code from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const eventCode = urlParams.get('code');
+    const event_id = urlParams.get('code');
+    const email = urlParams.get('email');
+    const token = urlParams.get('token');
 
-    if (!eventCode) {
+    if (!event_id) {
       console.error('No event code found in URL');
       return;
     }
 
     try {
       // Fetch event data
-      const response = await fetch(`https://api.3themind.com/v1/event/${eventCode}`, {
-        method: 'GET',
+      const response = await fetch(`https://api.3themind.com/v1/event/stream`, {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          event_id: Number(event_id),
+          email: email,
+          token: token,
+        }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to fetch event data');
       }
 
-      const eventData: EventData = await response.json();
+      const streamResponse: StreamResponse = await response.json();
+      const eventData = streamResponse.event;
       console.log('Event data:', eventData);
       const video = document.querySelector('[wized="video_player"]') as HTMLElement;
       setupMetadata(eventData);
@@ -63,7 +72,7 @@ const initializeApp = async () => {
         return;
       }
       // Initialize countdown with event data
-      initializeCountdown(eventData, video);
+      initializeCountdown(eventData, video, streamResponse.selectedDates);
     } catch (error) {
       console.error('Error fetching event data:', error);
     }
@@ -126,7 +135,11 @@ const initializePlayer = (video: HTMLElement, eventData: EventData) => {
   return { player, videoElement: video };
 };
 
-const initializeCountdown = async (eventData: EventData, videoElement: HTMLElement) => {
+const initializeCountdown = async (
+  eventData: EventData,
+  videoElement: HTMLElement,
+  selectedDates: EventDate[]
+) => {
   const countdownElement = document.querySelector<HTMLElement>('[wized="countdown_timer"]');
   const countdown_wrapper = document.querySelector<HTMLElement>('[wized="countdown_wrapper"]');
   const event_finished_wrapper = document.querySelector<HTMLElement>(
@@ -146,35 +159,11 @@ const initializeCountdown = async (eventData: EventData, videoElement: HTMLEleme
     console.error('Missing element: [wized="event_finished_wrapper"]');
     return;
   }
-  //get membership data via post request.
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const membershipData = await fetch(`https://api.3themind.com/v1/lead/lead-validate-event`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: urlParams.get('token'),
-      email: urlParams.get('email'),
-      event_id: Number(urlParams.get('code')),
-    }),
-  });
-  const data = await membershipData.json();
-  const { membership_level } = data;
-  //use membership level to get dates
   // Initialize event status handler
   const eventStatus = new EventStatus();
-  // Sort dates and find the next upcoming date
-  const dates = eventData.memberships.find(
-    (membership) => membership.id === membership_level
-  )?.dates;
-  if (!dates) {
-    console.error('No dates found');
-    return;
-  }
   const now = new Date();
-  const sortedDates = dates
+  const sortedDates = selectedDates
     .map((date) => ({
       start: new Date(Number(date.date) * 1000),
       end: new Date(Number(date.date) * 1000 + eventData.asset.duration * 1000),

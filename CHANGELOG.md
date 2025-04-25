@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.6
+
+### Patch Changes
+
+- 3e0276e: fix: urls
+
 ## 1.2.5
 
 ### Patch Changes

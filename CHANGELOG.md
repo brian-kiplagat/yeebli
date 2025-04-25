@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.7
+
+### Patch Changes
+
+- 1b5cad4: xx
+
 ## 1.2.6
 
 ### Patch Changes

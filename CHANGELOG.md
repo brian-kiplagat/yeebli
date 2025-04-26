@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.8
+
+### Patch Changes
+
+- ea8f614: fix: urls
+
 ## 1.2.7
 
 ### Patch Changes

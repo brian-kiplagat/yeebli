@@ -11,6 +11,8 @@ export class RouteGuard {
     { path: '/host/dashboard-host-view-owner', requireSubscription: true },
     { path: '/host/dashboard-host-view-priceplan', requireSubscription: true },
     { path: '/host/dashboard-host-add-price-plan', requireSubscription: true },
+    { path: '/host/dashboard-host-add-podcast', requireSubscription: true },
+    { path: '/host/dashboard-host-view-podcasts', requireSubscription: true },
     { path: '/host/dashboard-host-billing', requireSubscription: false },
     { path: '/host/dashboard-host-view-hosts', requireSubscription: true },
     { path: '/host/dashboard-host-update-profile', requireSubscription: true },

@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.11
+
+### Patch Changes
+
+- 78f5868: fix: remove
+
 ## 1.2.10
 
 ### Patch Changes

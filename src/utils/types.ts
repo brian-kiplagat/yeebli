@@ -13,3 +13,12 @@ export interface User {
   stripe_account_id: string | null;
   subscription_status: string | null;
 }
+
+export interface Tag {
+  id: number;
+  lead_id: number;
+  host_id: number;
+  tag: string;
+  created_at: string;
+  updated_at: string;
+}

@@ -1,8 +1,10 @@
 import { Chat } from '$utils/Chat';
 import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
+import { MultiSelect } from '$utils/multiSelect';
 import { formatDate, showError } from '$utils/reusables';
 import { RouteGuard } from '$utils/routeGuards';
+import type { Tag } from '$utils/types';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
 
@@ -103,6 +105,58 @@ const initializeApp = async () => {
       const videoModal = new VideoModal();
       videoModal.addToHead();
     }
+  }
+
+  //setup multi select
+  if (window.location.pathname === '/host/dashboard-host-update-lead') {
+    document.addEventListener('tagEvent', (e: Event) => {
+      const tags: Tag[] = (e as CustomEvent<Tag[]>).detail;
+      const tag_list = tags.map((tag) => ({
+        value: String(tag.id),
+        label: tag.tag,
+      }));
+
+      const container = document.querySelector<HTMLElement>('[wized="tag_div"]');
+      if (!container) {
+        showError('We could not find a tag div');
+        return;
+      }
+      new MultiSelect({
+        container: container,
+        options: tag_list,
+        selected: ['security'],
+        placeholder: 'Select or type to add tags',
+        allowCreation: true,
+        searchable: true,
+        clearable: true,
+        hideDropdownOnSelect: true,
+        onChange: (selected) => {
+          console.log('Multi select on change:', selected);
+        },
+        onCreateOption: async (value) => {
+          console.log(`Creating new tag: ${value}`);
+
+          //post the tag to endpoint with code url apram and tag
+          const urlParams = new URLSearchParams(window.location.search);
+          const lead_id = urlParams.get('code');
+          const response = await fetch(`https://api.3themind.com/v1/lead/tag`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lead_id: lead_id, tag: value }),
+          });
+          if (!response.ok) {
+            showError('Failed to create tag');
+            return { value, label: value }; // Return option even on error
+          }
+          return { value, label: value };
+        },
+      });
+    });
+
+    // map the tags to value and label
   }
 };
 

@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.10
+
+### Patch Changes
+
+- 41560c2: tags
+
 ## 1.2.9
 
 ### Patch Changes

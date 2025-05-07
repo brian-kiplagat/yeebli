@@ -115,7 +115,7 @@ const initializeApp = async () => {
         value: String(tag.id),
         label: tag.tag,
       }));
-      const selected_tags = tag_list.map((tag) => tag.label);
+      const selected_tags = tag_list.map((tag) => tag.value);
 
       const container = document.querySelector<HTMLElement>('[wized="tag_div"]');
       if (!container) {
@@ -132,7 +132,15 @@ const initializeApp = async () => {
         clearable: true,
         hideDropdownOnSelect: true,
         onChange: (selected) => {
-          console.log('Multi select on change:', selected);
+          //compare the selected tags with the tag_list and get the removed tags
+          const removed_tags = selected_tags.filter((tag) => !selected.includes(tag));
+          //for each, remove via api
+          removed_tags.forEach(async (tag) => {
+            await fetch(`https://api.3themind.com/v1/lead/tag/${tag}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${authToken}` },
+            });
+          });
         },
         onCreateOption: async (value) => {
           console.log(`Creating new tag: ${value}`);

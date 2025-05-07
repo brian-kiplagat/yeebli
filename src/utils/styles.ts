@@ -116,17 +116,23 @@ export const createMultiSelectStyles = (): string => `
 }
 
 [${Attributes.TAG}] {
-  display: inline-flex;
+  float: left;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  color: #000;
+  background-color: #fff;
+  border: .5px solid #6d6d6d;
+  border-radius: 100px;
+  justify-content: center;
   align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  margin: 2px 0;
-  border-radius: 4px;
-  background-color: #e5e7eb;
-  font-size: 13px;
-  line-height: 1.5;
-  transition: background-color 0.2s ease;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  padding: 0 7px 0 12px;
+  font-size: .8rem;
+  display: flex;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
+
 
 [${Attributes.TAG}]:hover {
   background-color: #d1d5db;
@@ -142,23 +148,26 @@ export const createMultiSelectStyles = (): string => `
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.8rem;
 }
 
 [${Attributes.TAG_REMOVE}] {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  padding: 0;
-  border: none;
+   border: none;
   border-radius: 50%;
-  background: transparent;
-  color: #6b7280;
-  font-size: 14px;
   line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
+  color: #fff;
+  background-color: red;
+  border-radius: 100px;
+  justify-content: center;
+  align-items: center;
+  width: 14px;
+  height: 14px;
+  padding-top: 1px;
+  font-family: Varela Round, sans-serif;
+  font-size: 0.5rem;
+  display: flex;
 }
 
 [${Attributes.TAG_REMOVE}]:hover {

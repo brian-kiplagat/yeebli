@@ -115,16 +115,17 @@ const initializeApp = async () => {
         value: String(tag.id),
         label: tag.tag,
       }));
+      const selected_tags = tag_list.map((tag) => tag.label);
 
       const container = document.querySelector<HTMLElement>('[wized="tag_div"]');
       if (!container) {
-        showError('We could not find a tag div');
+        console.error('We could not find a tag div');
         return;
       }
       new MultiSelect({
         container: container,
         options: tag_list,
-        selected: ['security'],
+        selected: selected_tags,
         placeholder: 'Select or type to add tags',
         allowCreation: true,
         searchable: true,
@@ -145,7 +146,7 @@ const initializeApp = async () => {
               Authorization: `Bearer ${authToken}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ lead_id: lead_id, tag: value }),
+            body: JSON.stringify({ lead_id: Number(lead_id), tag: value }),
           });
           if (!response.ok) {
             showError('Failed to create tag');

@@ -116,6 +116,8 @@ const initializeApp = async () => {
         label: tag.tag,
       }));
       const selected_tags = tag_list.map((tag) => tag.value);
+      const urlParams = new URLSearchParams(window.location.search);
+      const lead_id = urlParams.get('code');
 
       const container = document.querySelector<HTMLElement>('[wized="tag_div"]');
       if (!container) {
@@ -136,7 +138,7 @@ const initializeApp = async () => {
           const removed_tags = selected_tags.filter((tag) => !selected.includes(tag));
           //for each, remove via api
           removed_tags.forEach(async (tag) => {
-            await fetch(`https://api.3themind.com/v1/lead/tag/${tag}`, {
+            await fetch(`https://api.3themind.com/v1/tag/${tag}/lead/${lead_id}`, {
               method: 'DELETE',
               headers: { Authorization: `Bearer ${authToken}` },
             });

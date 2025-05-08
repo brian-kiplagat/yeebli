@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.13
+
+### Patch Changes
+
+- 25870a7: fix: tag
+
 ## 1.2.12
 
 ### Patch Changes

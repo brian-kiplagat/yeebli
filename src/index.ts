@@ -4,7 +4,6 @@ import { initializeFileUpload } from '$utils/fileUpload';
 import { MultiSelect } from '$utils/multiSelect';
 import { formatDate, showError } from '$utils/reusables';
 import { RouteGuard } from '$utils/routeGuards';
-import type { Tag } from '$utils/types';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
 
@@ -110,12 +109,18 @@ const initializeApp = async () => {
   //setup multi select
   if (window.location.pathname === '/host/dashboard-host-update-lead') {
     document.addEventListener('tagEvent', (e: Event) => {
-      const tags: Tag[] = (e as CustomEvent<Tag[]>).detail;
-      const tag_list = tags.map((tag) => ({
+      const customEvent = e as CustomEvent<TagEventDetail>;
+      const { options, selected } = customEvent.detail;
+
+      // Transform options into MultiSelect format
+      const tag_list = options.map((tag) => ({
         value: String(tag.id),
         label: tag.tag,
       }));
-      const selected_tags = tag_list.map((tag) => tag.value);
+
+      // Get currently selected tag IDs
+      const selected_tags = selected.map((item) => String(item.tag.id));
+
       const urlParams = new URLSearchParams(window.location.search);
       const lead_id = urlParams.get('code');
 
@@ -138,7 +143,7 @@ const initializeApp = async () => {
           const removed_tags = selected_tags.filter((tag) => !selected.includes(tag));
           //for each, remove via api
           removed_tags.forEach(async (tag) => {
-            await fetch(`https://api.3themind.com/v1/tag/${tag}/lead/${lead_id}`, {
+            await fetch(`https://api.3themind.com/v1/lead/tag/${tag}/lead/${lead_id}`, {
               method: 'DELETE',
               headers: { Authorization: `Bearer ${authToken}` },
             });
@@ -330,3 +335,25 @@ const initializeChat = (eventData: EventData) => {
     //console.log('New messages:', messages);
   });
 };
+
+interface TagOption {
+  id: number;
+  host_id: number;
+  tag: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface SelectedTag {
+  id: number;
+  tag_id: number;
+  lead_id: number;
+  created_at: string;
+  updated_at: string;
+  tag: TagOption;
+}
+
+interface TagEventDetail {
+  options: TagOption[];
+  selected: SelectedTag[];
+}

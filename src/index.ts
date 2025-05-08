@@ -119,7 +119,7 @@ const initializeApp = async () => {
       }));
 
       // Get currently selected tag IDs
-      const selected_tags = selected.map((item) => String(item.tag.id));
+      let selected_tags = selected.map((item) => String(item.tag.id));
 
       const urlParams = new URLSearchParams(window.location.search);
       const lead_id = urlParams.get('code');
@@ -139,8 +139,13 @@ const initializeApp = async () => {
         clearable: true,
         hideDropdownOnSelect: true,
         onChange: (selected) => {
+          console.log('Previous selected:', selected_tags);
+          console.log('New selected:', selected);
           //compare the selected tags with the tag_list and get the removed tags
           const removed_tags = selected_tags.filter((tag) => !selected.includes(tag));
+          const added_tags = selected.filter((tag) => !selected_tags.includes(tag));
+          console.log({ removed_tags, added_tags });
+
           //for each, remove via api
           removed_tags.forEach(async (tag) => {
             await fetch(`https://api.3themind.com/v1/lead/tag/${tag}/lead/${lead_id}`, {
@@ -148,6 +153,21 @@ const initializeApp = async () => {
               headers: { Authorization: `Bearer ${authToken}` },
             });
           });
+
+          //for each, add via api
+          added_tags.forEach(async (tag) => {
+            await fetch(`https://api.3themind.com/v1/lead/tag/assign`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ lead_id: Number(lead_id), tag_id: Number(tag) }),
+            });
+          });
+
+          // Update selected_tags with the new selection
+          selected_tags = [...selected];
         },
         onCreateOption: async (value) => {
           console.log(`Creating new tag: ${value}`);

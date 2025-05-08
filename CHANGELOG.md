@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.14
+
+### Patch Changes
+
+- 3d2091c: fix: tags
+
 ## 1.2.13
 
 ### Patch Changes

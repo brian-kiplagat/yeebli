@@ -54,6 +54,11 @@ export class EventStatus {
         if (this.chat_collumn) this.chat_collumn.style.display = 'none';
         if (this.interested_wrapper) this.interested_wrapper.style.display = 'flex';
         if (this.event_ending_expiry) this.event_ending_expiry.style.display = 'none';
+        //stop the video
+        const video = document.querySelector<HTMLVideoElement>('[video="video-element"]');
+        if (video) {
+          video.pause();
+        }
         break;
       }
       case 'live':

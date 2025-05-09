@@ -53,6 +53,8 @@ export class Video {
       'volume', // Volume control
       'captions', // Toggle captions
       'fullscreen', // Toggle fullscreen
+      /*'current-time', // Shows elapsed time
+      'duration', // Shows remaining time*/
     ];
 
     const startPlayback = (videoElement: HTMLVideoElement) => {

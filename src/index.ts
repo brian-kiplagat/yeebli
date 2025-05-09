@@ -4,6 +4,7 @@ import { initializeFileUpload } from '$utils/fileUpload';
 import { MultiSelect } from '$utils/multiSelect';
 import { formatDate, showError } from '$utils/reusables';
 import { RouteGuard } from '$utils/routeGuards';
+import type { TagEventDetail } from '$utils/types';
 import { Video } from '$utils/video';
 import { VideoModal } from '$utils/videoModal';
 
@@ -139,12 +140,9 @@ const initializeApp = async () => {
         clearable: true,
         hideDropdownOnSelect: true,
         onChange: (selected) => {
-          console.log('Previous selected:', selected_tags);
-          console.log('New selected:', selected);
           //compare the selected tags with the tag_list and get the removed tags
           const removed_tags = selected_tags.filter((tag) => !selected.includes(tag));
           const added_tags = selected.filter((tag) => !selected_tags.includes(tag));
-          console.log({ removed_tags, added_tags });
 
           //for each, remove via api
           removed_tags.forEach(async (tag) => {
@@ -170,8 +168,6 @@ const initializeApp = async () => {
           selected_tags = [...selected];
         },
         onCreateOption: async (value) => {
-          console.log(`Creating new tag: ${value}`);
-
           //post the tag to endpoint with code url apram and tag
           const urlParams = new URLSearchParams(window.location.search);
           const lead_id = urlParams.get('code');
@@ -255,12 +251,14 @@ const initializeCountdown = async (
   // Initialize event status handler
   const eventStatus = new EventStatus();
   const now = new Date();
+
   const sortedDates = selectedDates
     .map((date) => ({
       start: new Date(Number(date.date) * 1000),
       end: new Date(Number(date.date) * 1000 + eventData.asset.duration * 1000),
     }))
     .sort((a, b) => a.start.getTime() - b.start.getTime());
+
   const nextDate = sortedDates.find((date) => date.end > now);
 
   if (!nextDate) {
@@ -278,12 +276,15 @@ const initializeCountdown = async (
   // Format dates for display in local timezone
   const formattedStartDate = formatDate(eventStartDate, 'DD MMM YYYY HH:mm');
   const formattedEndDate = formatDate(eventEndDate, 'DD MMM YYYY HH:mm');
+
   console.log({
     formattedStartDate,
     formattedEndDate,
     sortedDates,
     nextDate,
     eventStartDate,
+    now,
+    durationSeconds: eventData.asset.duration,
     eventEndDate,
   });
 
@@ -292,7 +293,7 @@ const initializeCountdown = async (
   videoElement.style.display = 'none';
   event_finished_wrapper.style.display = 'none';
 
-  // Set up end time check function
+  // End time check function to check by video duration if the event is ending
   const setupEndTimeCheck = () => {
     const endCheckInterval = setInterval(() => {
       const now = new Date();
@@ -355,25 +356,3 @@ const initializeChat = (eventData: EventData) => {
     //console.log('New messages:', messages);
   });
 };
-
-interface TagOption {
-  id: number;
-  host_id: number;
-  tag: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface SelectedTag {
-  id: number;
-  tag_id: number;
-  lead_id: number;
-  created_at: string;
-  updated_at: string;
-  tag: TagOption;
-}
-
-interface TagEventDetail {
-  options: TagOption[];
-  selected: SelectedTag[];
-}

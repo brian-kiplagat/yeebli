@@ -22,3 +22,25 @@ export interface Tag {
   created_at: string;
   updated_at: string;
 }
+
+export interface TagOption {
+  id: number;
+  host_id: number;
+  tag: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SelectedTag {
+  id: number;
+  tag_id: number;
+  lead_id: number;
+  created_at: string;
+  updated_at: string;
+  tag: TagOption;
+}
+
+export interface TagEventDetail {
+  options: TagOption[];
+  selected: SelectedTag[];
+}

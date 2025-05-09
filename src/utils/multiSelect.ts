@@ -436,7 +436,7 @@ export class MultiSelect {
       case 'Backspace':
         if (this.inputElement.value === '' && this.selected.length > 0) {
           // Remove the last selected item when pressing backspace on empty input
-          this.removeOption(this.selected[this.selected.length - 1]);
+          //this.removeOption(this.selected[this.selected.length - 1]);
         }
         break;
     }

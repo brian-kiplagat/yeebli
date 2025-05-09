@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.15
+
+### Patch Changes
+
+- 3095f6b: fix: backspace
+
 ## 1.2.14
 
 ### Patch Changes

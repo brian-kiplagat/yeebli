@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.18
+
+### Patch Changes
+
+- 45f106e: fix: calendly
+
 ## 1.2.17
 
 ### Patch Changes

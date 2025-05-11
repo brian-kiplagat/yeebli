@@ -205,9 +205,14 @@ window.Webflow.push(() => {
 });
 
 const setupMetadata = (eventData: EventData) => {
-  const event_page_name = document.querySelector('[wized="event_page_name"]');
-  const event_page_description = document.querySelector('[wized="event_page_description"]');
-  const event_schedule_callback = document.querySelector('[wized="event_schedule_callback"]');
+  const event_page_name = document.querySelector<HTMLElement>('[wized="event_page_name"]');
+  const event_page_description = document.querySelector<HTMLElement>(
+    '[wized="event_page_description"]'
+  );
+  const event_schedule_callback = document.querySelector<HTMLElement>(
+    '[wized="event_schedule_callback"]'
+  );
+  const lead_upgrade_now = document.querySelector<HTMLElement>('[wized="lead_upgrade_now"]');
 
   if (event_page_name) {
     event_page_name.textContent = eventData.event_name;
@@ -219,6 +224,15 @@ const setupMetadata = (eventData: EventData) => {
 
   if (event_schedule_callback) {
     event_schedule_callback.addEventListener('click', () => {
+      window.open(eventData.calendar_url, '_blank');
+    });
+    if (!eventData.calendar_url) {
+      event_schedule_callback.style.display = 'none';
+    }
+  }
+
+  if (lead_upgrade_now) {
+    lead_upgrade_now.addEventListener('click', () => {
       window.open(eventData.calendar_url, '_blank');
     });
   }

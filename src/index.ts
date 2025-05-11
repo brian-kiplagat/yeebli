@@ -207,12 +207,20 @@ window.Webflow.push(() => {
 const setupMetadata = (eventData: EventData) => {
   const event_page_name = document.querySelector('[wized="event_page_name"]');
   const event_page_description = document.querySelector('[wized="event_page_description"]');
+  const event_schedule_callback = document.querySelector('[wized="event_schedule_callback"]');
 
   if (event_page_name) {
     event_page_name.textContent = eventData.event_name;
   }
+
   if (event_page_description) {
     event_page_description.textContent = eventData.event_description;
+  }
+
+  if (event_schedule_callback) {
+    event_schedule_callback.addEventListener('click', () => {
+      window.open(eventData.calendar_url, '_blank');
+    });
   }
 };
 

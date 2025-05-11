@@ -60,6 +60,7 @@ export interface EventData {
   host_id: number;
   asset: EventAsset;
   host: EventHost;
+  calendar_url: string;
   leadCount: number;
   memberships: EventMembership[];
 }

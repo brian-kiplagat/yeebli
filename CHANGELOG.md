@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.16
+
+### Patch Changes
+
+- c54cd41: fix: types
+
 ## 1.2.15
 
 ### Patch Changes

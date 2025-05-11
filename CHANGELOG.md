@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.17
+
+### Patch Changes
+
+- d5b8881: fix: remove absolute
+
 ## 1.2.16
 
 ### Patch Changes

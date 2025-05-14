@@ -1,5 +1,12 @@
 # @finsweet/developer-starter
 
+## 1.2.19
+
+### Patch Changes
+
+- c6fa879: fix: x
+- ca93ec6: fix: add courses route
+
 ## 1.2.18
 
 ### Patch Changes

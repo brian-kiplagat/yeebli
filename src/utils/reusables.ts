@@ -5,7 +5,7 @@ import type { Lead, User } from '../types/chat';
 export const getUserFromStorage = (): User | null => {
   const userString = localStorage.getItem('user');
   if (!userString) {
-    showError('User not found');
+    showNotification('User not found');
     return null;
   }
   return JSON.parse(userString) as User;
@@ -14,7 +14,7 @@ export const getUserFromStorage = (): User | null => {
 export const getLeadFromStorage = (): Lead | null => {
   const leadString = localStorage.getItem('lead');
   if (!leadString) {
-    showError('Lead not found');
+    showNotification('Lead not found');
     return null;
   }
   return JSON.parse(leadString) as Lead;
@@ -127,7 +127,10 @@ export const formatChatDate = (date: string | Date): string => {
   return formatDate(d, 'DD MMM HH:mm');
 };
 
-export const showError = (message: string) => {
+export const showNotification = (
+  message: string,
+  type: 'success' | 'warning' | 'error' = 'error'
+) => {
   const notyf = new Notyf({
     duration: 1000,
     position: {
@@ -135,6 +138,10 @@ export const showError = (message: string) => {
       y: 'top',
     },
     types: [
+      {
+        type: 'success',
+        background: 'green',
+      },
       {
         type: 'warning',
         background: 'orange',
@@ -152,5 +159,12 @@ export const showError = (message: string) => {
       },
     ],
   });
-  notyf.error(message);
+
+  if (type === 'success') {
+    notyf.success(message);
+  } else if (type === 'warning') {
+    notyf.open({ type: 'warning', message });
+  } else {
+    notyf.error(message);
+  }
 };

@@ -1,4 +1,4 @@
-import { showError } from './reusables';
+import { showNotification } from './reusables';
 
 interface PresignedUrlResponse {
   presignedUrl: string;
@@ -149,7 +149,7 @@ export class FileUploader {
           });
           document.dispatchEvent(metadataEvent);
         } catch (error) {
-          showError('An error occurred while getting the video duration');
+          showNotification('An error occurred while getting the video duration');
           console.error('Failed to get video duration:', error);
         }
       }
@@ -217,7 +217,7 @@ export class FileUploader {
         xhr.send(file);
       });
     } catch (error) {
-      showError('An error occurred while uploading this file');
+      showNotification('An error occurred while uploading this file');
       console.error(error);
       return {
         success: false,
@@ -277,7 +277,7 @@ export function initializeFileUpload(authToken: string) {
   const fileInput = document.querySelector('[wized="file_uploader"]') as HTMLInputElement;
 
   if (!fileInput) {
-    showError('File upload input not found');
+    showNotification('File upload input not found');
     return;
   }
 

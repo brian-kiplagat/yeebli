@@ -2,7 +2,7 @@ import { Chat } from '$utils/Chat';
 import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
 import { MultiSelect } from '$utils/multiSelect';
-import { formatDate, showError } from '$utils/reusables';
+import { formatDate, showNotification } from '$utils/reusables';
 import { RouteGuard } from '$utils/routeGuards';
 import type { TagEventDetail } from '$utils/types';
 import { Video } from '$utils/video';
@@ -47,7 +47,7 @@ const initializeApp = async () => {
     const isHost = urlParams.get('isHost');
 
     if (!event_id) {
-      showError('Event Id not found.Ensure you have the correct event link');
+      showNotification('Event Id not found.Ensure you have the correct event link');
       return;
     }
 
@@ -69,23 +69,23 @@ const initializeApp = async () => {
 
       if (!response.ok) {
         const error = await response.json();
-        showError(error.error || error.message || 'Failed to fetch event data');
+        showNotification(error.error || error.message || 'Failed to fetch event data');
         return;
       }
 
       const streamResponse: StreamResponse = await response.json();
       const eventData = streamResponse.event;
       const video = document.querySelector('[wized="video_player"]') as HTMLElement;
-      setupMetadata(eventData);
+      setupMetadata(eventData, streamResponse);
       if (!video) {
-        showError('We could not find a video for this event');
+        showNotification('We could not find a video for this event');
         return;
       }
       // Initialize countdown with event data
       initializeCountdown(eventData, video, streamResponse.selectedDates);
     } catch (error) {
       console.error('Error fetching event data:', error);
-      showError('An error occurred while fetching this event');
+      showNotification('An error occurred while fetching this event');
     }
   }
   // Set auth token for RouteGuard (even if null) and let it handle the auth check
@@ -180,7 +180,7 @@ const initializeApp = async () => {
             body: JSON.stringify({ lead_id: Number(lead_id), tag: value }),
           });
           if (!response.ok) {
-            showError('Failed to create tag');
+            showNotification('Failed to create tag');
             return { value, label: value }; // Return option even on error
           }
           return { value, label: value };
@@ -204,7 +204,7 @@ window.Webflow.push(() => {
   }
 });
 
-const setupMetadata = (eventData: EventData) => {
+const setupMetadata = (eventData: EventData, streamResponse: StreamResponse) => {
   const event_page_name = document.querySelector<HTMLElement>('[wized="event_page_name"]');
   const event_page_description = document.querySelector<HTMLElement>(
     '[wized="event_page_description"]'
@@ -212,6 +212,7 @@ const setupMetadata = (eventData: EventData) => {
   const event_schedule_callback = document.querySelector<HTMLElement>(
     '[wized="event_schedule_callback"]'
   );
+  const event_save_callback = document.querySelector<HTMLElement>('[wized="event_save_callback"]');
   const lead_upgrade_now = document.querySelector<HTMLElement>('[wized="lead_upgrade_now"]');
 
   if (event_page_name) {
@@ -234,6 +235,33 @@ const setupMetadata = (eventData: EventData) => {
   if (lead_upgrade_now) {
     lead_upgrade_now.addEventListener('click', () => {
       window.open(eventData.calendar_url, '_blank');
+    });
+  }
+
+  if (event_save_callback) {
+    event_save_callback.addEventListener('click', async () => {
+      const response = await fetch(`https://api.3themind.com/v1/callback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventData.id,
+          lead_id: streamResponse.lead.id,
+          callback_type: 'instant',
+          notes: 'Saved Lead Callback',
+          host_id: eventData.host_id,
+        }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        showNotification(error.error || error.message || 'Failed to save lead callback', 'error');
+        return;
+      }
+      showNotification(
+        'Your callback has been saved. The host will contact you shortly',
+        'success'
+      );
     });
   }
 };

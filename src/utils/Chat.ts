@@ -15,7 +15,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from '../config/firebase-config';
 import type { ChatMessage } from '../types/chat';
 import type { EventData } from '../types/event';
-import { formatChatDate, getLeadFromStorage, showError } from './reusables';
+import { formatChatDate, getLeadFromStorage, showNotification } from './reusables';
 
 export class Chat {
   private db: Firestore;
@@ -232,7 +232,7 @@ export class Chat {
         await this.sendMessage(String(lead.id), lead.name, messageInput.value.trim(), isHost);
         messageInput.value = ''; // Clear input after successful send
       } catch (error) {
-        showError('An error occurred while sending this message');
+        showNotification('An error occurred while sending this message');
         console.error(error);
       }
     });
@@ -287,7 +287,7 @@ export class Chat {
       // The message will be automatically removed from the UI
       // through the Firestore snapshot listener
     } catch (error) {
-      showError('An error occurred while deleting this message');
+      showNotification('An error occurred while deleting this message');
       console.error(error);
     }
   }

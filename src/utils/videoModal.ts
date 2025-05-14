@@ -2,7 +2,7 @@ import 'plyr/dist/plyr.css';
 
 import Plyr from 'plyr';
 
-import { showError } from './reusables';
+import { showNotification } from './reusables';
 
 export class VideoModal {
   private player: Plyr | null = null;
@@ -65,7 +65,7 @@ export class VideoModal {
         if (videoUrl) {
           this.openVideoModal(videoUrl);
         } else {
-          showError('No presigned URL found for video preview');
+          showNotification('No presigned URL found for video preview');
           console.error('No presigned URL found for video preview', preview);
         }
       });

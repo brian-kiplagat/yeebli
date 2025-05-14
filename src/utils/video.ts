@@ -5,7 +5,7 @@ import Plyr from 'plyr';
 import type { EventData } from 'src/types/event';
 
 import { EventStatus } from './eventStatus';
-import { showError } from './reusables';
+import { showNotification } from './reusables';
 
 export class Video {
   private player: Plyr | null = null;
@@ -67,7 +67,9 @@ export class Video {
         console.error('Autoplay policy:', autoplayPolicy);
 
         if (autoplayPolicy === 'disallowed') {
-          showError('Autoplay is not allowed. Please press the play button to start the stream');
+          showNotification(
+            'Autoplay is not allowed. Please press the play button to start the stream'
+          );
           // Handle disallowed case - maybe show a play button
           return;
         }
@@ -95,11 +97,11 @@ export class Video {
       // Handle autoplay errors
       this.player.on('error', () => {
         const { error } = videoElement;
-        showError('An error occurred while playing this video');
+        showNotification('An error occurred while playing this video');
         console.error(error);
         if (error?.code === 4) {
           // MEDIA_ERR_ABORTED
-          showError(
+          showNotification(
             'Autoplay was blocked due to browser policy. Please press the play button to start the stream'
           );
         }
@@ -131,15 +133,15 @@ export class Video {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              showError('Network error, attempting to recover...');
+              showNotification('Network error, attempting to recover...');
               this.hls?.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              showError('Media error, attempting to recover...');
+              showNotification('Media error, attempting to recover...');
               this.hls?.recoverMediaError();
               break;
             default:
-              showError('Fatal HLS error, destroying...');
+              showNotification('Fatal HLS error, destroying...');
               this.cleanup();
               break;
           }

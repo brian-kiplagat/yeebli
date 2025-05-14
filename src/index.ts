@@ -137,7 +137,7 @@ const initializeApp = async () => {
         placeholder: 'Select or type to add tags',
         allowCreation: true,
         searchable: true,
-        clearable: true,
+        clearable: false,
         hideDropdownOnSelect: true,
         onChange: (selected) => {
           //compare the selected tags with the tag_list and get the removed tags

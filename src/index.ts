@@ -69,7 +69,7 @@ const initializeApp = async () => {
 
       if (!response.ok) {
         const error = await response.json();
-        showNotification(error.error || error.message || 'Failed to fetch event data');
+        showNotification(error.error || error.message || 'Failed to fetch event data', 'warning');
         return;
       }
 

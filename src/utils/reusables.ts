@@ -141,15 +141,12 @@ export const showNotification = (
       {
         type: 'success',
         background: 'green',
+        duration: 2500,
       },
       {
         type: 'warning',
         background: 'orange',
-        icon: {
-          className: 'material-icons',
-          tagName: 'i',
-          text: 'warning',
-        },
+        duration: 3000,
       },
       {
         type: 'error',

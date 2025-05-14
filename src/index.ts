@@ -212,6 +212,7 @@ const setupMetadata = (eventData: EventData, streamResponse: StreamResponse) => 
   const event_schedule_callback = document.querySelector<HTMLElement>(
     '[wized="event_schedule_callback"]'
   );
+  const lead_name = document.querySelector<HTMLElement>('[wized="lead_name"]');
   const event_save_callback = document.querySelector<HTMLElement>('[wized="event_save_callback"]');
   const lead_upgrade_now = document.querySelector<HTMLElement>('[wized="lead_upgrade_now"]');
 
@@ -236,6 +237,16 @@ const setupMetadata = (eventData: EventData, streamResponse: StreamResponse) => 
     lead_upgrade_now.addEventListener('click', () => {
       window.open(eventData.calendar_url, '_blank');
     });
+  }
+
+  if (lead_name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isHost = urlParams.get('isHost');
+    if (isHost) {
+      lead_name.textContent = eventData.host.name + ' (Host)';
+    } else {
+      lead_name.textContent = streamResponse.lead.name;
+    }
   }
 
   if (event_save_callback) {

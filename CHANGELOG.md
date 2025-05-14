@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.20
+
+### Patch Changes
+
+- 7c45e94: fix: changeset
+
 ## 1.2.19
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.21
+
+### Patch Changes
+
+- 0fcf42f: fix: host
+
 ## 1.2.20
 
 ### Patch Changes

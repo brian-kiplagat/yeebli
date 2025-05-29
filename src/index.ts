@@ -1,3 +1,4 @@
+import { AsyncMultiSelect } from '$utils/asyncMultiSelect';
 import { Chat } from '$utils/Chat';
 import { Countdown } from '$utils/countdown';
 import { initializeFileUpload } from '$utils/fileUpload';
@@ -189,6 +190,62 @@ const initializeApp = async () => {
     });
 
     // map the tags to value and label
+  }
+  //setup multi select
+  if (window.location.pathname === '/host/dashboard-host-view-messaging') {
+    const container = document.querySelector<HTMLElement>('[wized="search_container"]');
+    if (!container) {
+      console.error('We could not find a messaging container');
+      return;
+    }
+    const multiSelect = new AsyncMultiSelect(
+      {
+        container: container,
+        options: [],
+        selected: [],
+        placeholder: 'Select or type to add tags',
+      },
+      authToken || ''
+    );
+    const form = document.querySelector<HTMLElement>('[wized="broadcast_message_form"]');
+    if (!form) {
+      console.error('We could not find a search form');
+      return;
+    }
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const subject = form.querySelector<HTMLInputElement>('[wized="subject"]');
+      const message = form.querySelector<HTMLTextAreaElement>('[wized="message"]');
+      if (!subject || !message) {
+        showNotification('We could not find a subject or message');
+        return;
+      }
+      const subjectValue = subject.value;
+      const messageValue = message.value;
+
+      const checkedRadio = document.querySelector<HTMLInputElement>(
+        'input[name="MessageRadio"]:checked'
+      );
+      const checkedValue = checkedRadio ? checkedRadio.value : null;
+
+      fetch(`https://api.3themind.com/v1/email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          subject: subjectValue,
+          title: subjectValue,
+          subtitle: '3TheMind',
+          body: messageValue,
+          button_text: 'View Event',
+          type: checkedValue,
+          button_link: 'https://3themind.com',
+          recipients: multiSelect.getSelected().map((recipient) => Number(recipient)),
+        }),
+      });
+    });
   }
 };
 

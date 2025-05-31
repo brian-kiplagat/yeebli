@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.22
+
+### Patch Changes
+
+- f80ebb6: fix: hide dropdown
+
 ## 1.2.21
 
 ### Patch Changes

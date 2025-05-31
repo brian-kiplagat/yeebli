@@ -594,7 +594,7 @@ export class AsyncMultiSelect {
     this.render();
     this.updateFormValue();
     this.config.onChange?.(this.selected, this);
-    this.renderDropdown();
+    this.open();
   }
 
   private async createOption(value: string) {
@@ -637,6 +637,12 @@ export class AsyncMultiSelect {
     }
 
     const filteredOptions = this.getFilteredOptions();
+
+    if (filteredOptions.length === 0) {
+      this.close();
+      return;
+    }
+
     this.dropdownElement.style.display = 'block';
     this.dropdownElement.innerHTML = '';
 

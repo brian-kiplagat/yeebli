@@ -468,7 +468,13 @@ export class AsyncMultiSelect {
         const data = await response.json();
         // Transform the API response to match our Option interface
         if (data.results && Array.isArray(data.results)) {
-          this.options = data.results.map((result: SearchResult) => {
+          // Keep existing options that are already selected
+          const existingSelectedOptions = this.options.filter((option) =>
+            this.selected.includes(option.value)
+          );
+
+          // Add new search results
+          const newOptions = data.results.map((result: SearchResult) => {
             if ('name' in result) {
               // It's a Lead
               return {
@@ -484,6 +490,9 @@ export class AsyncMultiSelect {
               title: result.event_description,
             };
           });
+
+          // Combine existing selected options with new search results
+          this.options = [...existingSelectedOptions, ...newOptions];
           this.renderDropdown();
         }
       } catch (error) {

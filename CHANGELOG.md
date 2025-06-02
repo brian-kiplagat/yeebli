@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.27
+
+### Patch Changes
+
+- d5390ef: fix: error
+
 ## 1.2.26
 
 ### Patch Changes

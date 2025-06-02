@@ -2,6 +2,8 @@ import { Notyf } from 'notyf';
 
 import type { Lead, User } from '../types/chat';
 
+let notyfInstance: Notyf | null = null;
+
 export const getUserFromStorage = (): User | null => {
   const userString = localStorage.getItem('user');
   if (!userString) {
@@ -131,37 +133,39 @@ export const showNotification = (
   message: string,
   type: 'success' | 'warning' | 'error' = 'error'
 ) => {
-  const notyf = new Notyf({
-    duration: 1000,
-    position: {
-      x: 'right',
-      y: 'top',
-    },
-    types: [
-      {
-        type: 'success',
-        background: 'green',
-        duration: 2500,
+  if (!notyfInstance) {
+    notyfInstance = new Notyf({
+      duration: 1000,
+      position: {
+        x: 'right',
+        y: 'top',
       },
-      {
-        type: 'warning',
-        background: 'orange',
-        duration: 3000,
-      },
-      {
-        type: 'error',
-        background: 'indianred',
-        duration: 4000,
-        dismissible: true,
-      },
-    ],
-  });
+      types: [
+        {
+          type: 'success',
+          background: 'green',
+          duration: 2500,
+        },
+        {
+          type: 'warning',
+          background: 'orange',
+          duration: 3000,
+        },
+        {
+          type: 'error',
+          background: 'indianred',
+          duration: 4000,
+          dismissible: true,
+        },
+      ],
+    });
+  }
 
   if (type === 'success') {
-    notyf.success(message);
+    notyfInstance.success(message);
   } else if (type === 'warning') {
-    notyf.open({ type: 'warning', message });
+    notyfInstance.open({ type: 'warning', message });
   } else {
-    notyf.error(message);
+    notyfInstance.error(message);
   }
 };

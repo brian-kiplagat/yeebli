@@ -22,12 +22,15 @@ function addToHead(): void {
     plyrCss.href = 'https://cdn.plyr.io/3.7.8/plyr.css';
     plyrCss.rel = 'stylesheet';
     document.head.appendChild(plyrCss);
-    //<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
-    const notyfCss = document.createElement('link');
-    notyfCss.href = 'https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css';
-    notyfCss.rel = 'stylesheet';
-    document.head.appendChild(notyfCss);
   }
+}
+
+// Add Notyf CSS to head
+if (!document.querySelector('link[href*="notyf.min.css"]')) {
+  const notyfCss = document.createElement('link');
+  notyfCss.href = 'https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css';
+  notyfCss.rel = 'stylesheet';
+  document.head.appendChild(notyfCss);
 }
 
 const initializeApp = async () => {
@@ -213,6 +216,7 @@ const initializeApp = async () => {
       return;
     }
     form.addEventListener('submit', async (e: Event) => {
+      e.stopImmediatePropagation();
       e.preventDefault();
       const subject = form.querySelector<HTMLInputElement>('[wized="subject"]');
       const message = form.querySelector<HTMLTextAreaElement>('[wized="message"]');
@@ -251,7 +255,11 @@ const initializeApp = async () => {
         showNotification(error.error || error.message || 'Failed to send email', 'error');
         return;
       }
-      showNotification('Email sent successfully', 'success');
+
+      showNotification(
+        'Email sent successfully to ' + multiSelect.getSelected().length + ' recipients',
+        'success'
+      );
     });
   }
 };

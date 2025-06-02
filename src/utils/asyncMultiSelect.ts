@@ -443,71 +443,71 @@ export class AsyncMultiSelect {
   }
 
   private async handleInput() {
+    const searchValue = this.inputElement.value.trim();
+
+    if (!searchValue) {
+      this.close();
+      return;
+    }
+
     this.open();
 
-    const searchValue = this.inputElement.value.trim();
-    if (searchValue) {
-      try {
-        const searchType = this.getSearchType();
-        const response = await fetch('https://api.3themind.com/v1/lead/search', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.authToken}`,
-          },
-          body: JSON.stringify({
-            search_by: searchType,
-            search_value: searchValue.toLowerCase(),
-          }),
-        });
+    try {
+      const searchType = this.getSearchType();
+      const response = await fetch('https://api.3themind.com/v1/lead/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authToken}`,
+        },
+        body: JSON.stringify({
+          search_by: searchType,
+          search_value: searchValue.toLowerCase(),
+        }),
+      });
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-        const data = await response.json();
-        // Transform the API response to match our Option interface
-        if (data.results && Array.isArray(data.results)) {
-          // Keep existing options that are already selected
-          const existingSelectedOptions = this.options.filter((option) =>
-            this.selected.includes(option.value)
-          );
+      const data = await response.json();
+      // Transform the API response to match our Option interface
+      if (data.results && Array.isArray(data.results)) {
+        // Keep existing options that are already selected
+        const existingSelectedOptions = this.options.filter((option) =>
+          this.selected.includes(option.value)
+        );
 
-          // Add new search results
-          const newOptions = data.results.map((result: SearchResult) => {
-            if ('name' in result) {
-              // It's a Lead
-              return {
-                value: result.id.toString(),
-                label: `${result.name} - ${result.email}`,
-                title: `${result.name} - ${result.email}`,
-              };
-            }
-            // It's an Event
+        // Add new search results
+        const newOptions = data.results.map((result: SearchResult) => {
+          if ('name' in result) {
+            // It's a Lead
             return {
               value: result.id.toString(),
-              label: result.event_name,
-              title: result.event_description,
+              label: `${result.name} - ${result.email}`,
+              title: `${result.name} - ${result.email}`,
             };
-          });
+          }
+          // It's an Event
+          return {
+            value: result.id.toString(),
+            label: result.event_name,
+            title: result.event_description,
+          };
+        });
 
-          // Create a Set of existing option values to track duplicates
-          const existingValues = new Set(existingSelectedOptions.map((opt: Option) => opt.value));
+        // Create a Set of existing option values to track duplicates
+        const existingValues = new Set(existingSelectedOptions.map((opt: Option) => opt.value));
 
-          // Filter out duplicates from new options
-          const uniqueNewOptions = newOptions.filter(
-            (opt: Option) => !existingValues.has(opt.value)
-          );
+        // Filter out duplicates from new options
+        const uniqueNewOptions = newOptions.filter((opt: Option) => !existingValues.has(opt.value));
 
-          // Combine existing selected options with unique new search results
-          this.options = [...existingSelectedOptions, ...uniqueNewOptions];
-          this.renderDropdown();
-        }
-      } catch (error) {
-        console.error('Error fetching results:', error);
+        // Combine existing selected options with unique new search results
+        this.options = [...existingSelectedOptions, ...uniqueNewOptions];
+        this.renderDropdown();
       }
-    } else {
-      this.renderDropdown();
+    } catch (error) {
+      console.error('Error fetching results:', error);
     }
   }
 

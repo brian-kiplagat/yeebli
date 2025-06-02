@@ -611,7 +611,11 @@ export class AsyncMultiSelect {
     this.render();
     this.updateFormValue();
     this.config.onChange?.(this.selected, this);
-    this.open();
+
+    // Only open dropdown if there's input text
+    if (this.inputElement.value.trim()) {
+      this.open();
+    }
   }
 
   private async createOption(value: string) {

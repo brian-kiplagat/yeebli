@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.28
+
+### Patch Changes
+
+- a66c39a: chore: clean up
+
 ## 1.2.27
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.23
+
+### Patch Changes
+
+- 11e7a6d: fix: retain results
+
 ## 1.2.22
 
 ### Patch Changes

@@ -260,6 +260,11 @@ const initializeApp = async () => {
         'Email sent successfully to ' + multiSelect.getSelected().length + ' recipients',
         'success'
       );
+      //clear form values;
+      subject.value = '';
+      message.value = '';
+      multiSelect.clear();
+      multiSelect.removeAllOptions();
     });
   }
 };

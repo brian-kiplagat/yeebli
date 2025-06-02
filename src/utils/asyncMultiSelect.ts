@@ -193,6 +193,14 @@ export class AsyncMultiSelect {
   }
 
   /**
+   * Removes all options from the dropdown
+   */
+  public removeAllOptions(): void {
+    this.options = [];
+    this.renderDropdown();
+  }
+
+  /**
    * Opens the dropdown
    */
   public open(): void {

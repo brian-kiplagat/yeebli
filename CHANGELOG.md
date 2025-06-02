@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.26
+
+### Patch Changes
+
+- 0e7644a: fix: search
+
 ## 1.2.25
 
 ### Patch Changes

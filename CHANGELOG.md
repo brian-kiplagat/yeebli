@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.24
+
+### Patch Changes
+
+- 6010731: fix: search
+
 ## 1.2.23
 
 ### Patch Changes

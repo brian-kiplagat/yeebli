@@ -1,5 +1,11 @@
 # @finsweet/developer-starter
 
+## 1.2.25
+
+### Patch Changes
+
+- f494765: fix: input search
+
 ## 1.2.24
 
 ### Patch Changes

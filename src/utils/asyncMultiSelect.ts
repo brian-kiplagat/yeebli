@@ -608,6 +608,8 @@ export class AsyncMultiSelect {
 
   private removeOption(value: string) {
     this.selected = this.selected.filter((v) => v !== value);
+    // Remove only the unselected option from the options array
+    this.options = this.options.filter((option) => option.value !== value);
     this.render();
     this.updateFormValue();
     this.config.onChange?.(this.selected, this);

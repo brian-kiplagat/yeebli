@@ -212,7 +212,7 @@ const initializeApp = async () => {
       console.error('We could not find a search form');
       return;
     }
-    form.addEventListener('submit', (e: Event) => {
+    form.addEventListener('submit', async (e: Event) => {
       e.preventDefault();
       const subject = form.querySelector<HTMLInputElement>('[wized="subject"]');
       const message = form.querySelector<HTMLTextAreaElement>('[wized="message"]');
@@ -228,7 +228,7 @@ const initializeApp = async () => {
       );
       const checkedValue = checkedRadio ? checkedRadio.value : null;
 
-      fetch(`https://api.3themind.com/v1/email`, {
+      const response = await fetch(`https://api.3themind.com/v1/email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -245,6 +245,13 @@ const initializeApp = async () => {
           recipients: multiSelect.getSelected().map((recipient) => Number(recipient)),
         }),
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        showNotification(error.error || error.message || 'Failed to send email', 'error');
+        return;
+      }
+      showNotification('Email sent successfully', 'success');
     });
   }
 };

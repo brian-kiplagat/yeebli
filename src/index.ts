@@ -212,7 +212,7 @@ const initializeApp = async () => {
       console.error('We could not find a search form');
       return;
     }
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', (e: Event) => {
       e.preventDefault();
       const subject = form.querySelector<HTMLInputElement>('[wized="subject"]');
       const message = form.querySelector<HTMLTextAreaElement>('[wized="message"]');

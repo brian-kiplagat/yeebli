@@ -457,7 +457,7 @@ export class AsyncMultiSelect {
           },
           body: JSON.stringify({
             search_by: searchType,
-            search_value: searchValue,
+            search_value: searchValue.toLowerCase(),
           }),
         });
 
@@ -491,8 +491,16 @@ export class AsyncMultiSelect {
             };
           });
 
-          // Combine existing selected options with new search results
-          this.options = [...existingSelectedOptions, ...newOptions];
+          // Create a Set of existing option values to track duplicates
+          const existingValues = new Set(existingSelectedOptions.map((opt: Option) => opt.value));
+
+          // Filter out duplicates from new options
+          const uniqueNewOptions = newOptions.filter(
+            (opt: Option) => !existingValues.has(opt.value)
+          );
+
+          // Combine existing selected options with unique new search results
+          this.options = [...existingSelectedOptions, ...uniqueNewOptions];
           this.renderDropdown();
         }
       } catch (error) {
